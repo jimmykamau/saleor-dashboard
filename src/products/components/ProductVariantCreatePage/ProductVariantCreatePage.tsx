@@ -1,6 +1,4 @@
-import React from "react";
-import { useIntl } from "react-intl";
-
+import { ProductErrorFragment } from "@saleor/attributes/types/ProductErrorFragment";
 import AppHeader from "@saleor/components/AppHeader";
 import CardSpacer from "@saleor/components/CardSpacer";
 import { ConfirmButtonTransitionState } from "@saleor/components/ConfirmButton";
@@ -14,15 +12,18 @@ import useFormset, {
   FormsetData
 } from "@saleor/hooks/useFormset";
 import { getVariantAttributeInputFromProduct } from "@saleor/products/utils/data";
-import { ProductErrorFragment } from "@saleor/attributes/types/ProductErrorFragment";
+import { SearchWarehouses_search_edges_node } from "@saleor/searches/types/SearchWarehouses";
+import React from "react";
+import { useIntl } from "react-intl";
+
 import { maybe } from "../../../misc";
 import { ProductVariantCreateData_product } from "../../types/ProductVariantCreateData";
+import ProductStocks, { ProductStockInput } from "../ProductStocks";
 import ProductVariantAttributes, {
   VariantAttributeInputData
 } from "../ProductVariantAttributes";
 import ProductVariantNavigation from "../ProductVariantNavigation";
 import ProductVariantPrice from "../ProductVariantPrice";
-import ProductVariantStock from "../ProductVariantStock";
 
 interface ProductVariantCreatePageFormData {
   costPrice: string;
@@ -30,20 +31,23 @@ interface ProductVariantCreatePageFormData {
   priceOverride: string;
   quantity: string;
   sku: string;
+  trackInventory: boolean;
 }
 
 export interface ProductVariantCreatePageSubmitData
   extends ProductVariantCreatePageFormData {
   attributes: FormsetData<VariantAttributeInputData>;
+  stocks: ProductStockInput[];
 }
 
 interface ProductVariantCreatePageProps {
   currencySymbol: string;
+  disabled: boolean;
   errors: ProductErrorFragment[];
   header: string;
-  loading: boolean;
   product: ProductVariantCreateData_product;
   saveButtonBarState: ConfirmButtonTransitionState;
+  warehouses: SearchWarehouses_search_edges_node[];
   onBack: () => void;
   onSubmit: (data: ProductVariantCreatePageSubmitData) => void;
   onVariantClick: (variantId: string) => void;
@@ -51,11 +55,12 @@ interface ProductVariantCreatePageProps {
 
 const ProductVariantCreatePage: React.FC<ProductVariantCreatePageProps> = ({
   currencySymbol,
+  disabled,
   errors,
-  loading,
   header,
   product,
   saveButtonBarState,
+  warehouses,
   onBack,
   onSubmit,
   onVariantClick
@@ -68,28 +73,27 @@ const ProductVariantCreatePage: React.FC<ProductVariantCreatePageProps> = ({
   const { change: changeAttributeData, data: attributes } = useFormset(
     attributeInput
   );
+  const {
+    add: addStock,
+    change: changeStockData,
+    data: stocks,
+    remove: removeStock
+  } = useFormset<null, string>([]);
 
-  const initialForm = {
-    attributes: maybe(
-      () =>
-        product.productType.variantAttributes.map(attribute => ({
-          name: attribute.name,
-          slug: attribute.slug,
-          values: [""]
-        })),
-      []
-    ),
+  const initialForm: ProductVariantCreatePageFormData = {
     costPrice: "",
     images: maybe(() => product.images.map(image => image.id)),
     priceOverride: "",
     quantity: "0",
-    sku: ""
+    sku: "",
+    trackInventory: true
   };
 
   const handleSubmit = (data: ProductVariantCreatePageFormData) =>
     onSubmit({
       ...data,
-      attributes
+      attributes,
+      stocks
     });
 
   return (
@@ -119,7 +123,7 @@ const ProductVariantCreatePage: React.FC<ProductVariantCreatePageProps> = ({
               <div>
                 <ProductVariantAttributes
                   attributes={attributes}
-                  disabled={loading}
+                  disabled={disabled}
                   errors={errors}
                   onChange={handleAttributeChange}
                 />
@@ -129,21 +133,40 @@ const ProductVariantCreatePage: React.FC<ProductVariantCreatePageProps> = ({
                   priceOverride={data.priceOverride}
                   currencySymbol={currencySymbol}
                   costPrice={data.costPrice}
-                  loading={loading}
+                  loading={disabled}
                   onChange={change}
                 />
                 <CardSpacer />
-                <ProductVariantStock
+                <ProductStocks
+                  data={data}
+                  disabled={disabled}
+                  onFormDataChange={change}
                   errors={errors}
-                  sku={data.sku}
-                  quantity={data.quantity}
-                  loading={loading}
-                  onChange={change}
+                  stocks={stocks}
+                  warehouses={warehouses}
+                  onChange={(id, value) => {
+                    triggerChange();
+                    changeStockData(id, value);
+                  }}
+                  onWarehouseStockAdd={id => {
+                    triggerChange();
+                    addStock({
+                      data: null,
+                      id,
+                      label: warehouses.find(warehouse => warehouse.id === id)
+                        .name,
+                      value: "0"
+                    });
+                  }}
+                  onWarehouseStockDelete={id => {
+                    triggerChange();
+                    removeStock(id);
+                  }}
                 />
               </div>
             </Grid>
             <SaveButtonBar
-              disabled={loading || !onSubmit || !hasChanged}
+              disabled={disabled || !onSubmit || !hasChanged}
               labels={{
                 delete: intl.formatMessage({
                   defaultMessage: "Delete Variant",

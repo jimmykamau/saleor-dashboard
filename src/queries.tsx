@@ -5,8 +5,10 @@ import React from "react";
 import { Query, QueryResult } from "react-apollo";
 import { useIntl } from "react-intl";
 
+import { isJwtError } from "./auth/errors";
 import useAppState from "./hooks/useAppState";
 import useNotifier from "./hooks/useNotifier";
+import useUser from "./hooks/useUser";
 import { commonMessages } from "./intl";
 import { maybe, RequireAtLeastOne } from "./misc";
 
@@ -65,9 +67,10 @@ export function TypedQuery<TData, TVariables>(
   query: DocumentNode
 ): React.FC<TypedQueryInnerProps<TData, TVariables>> {
   return ({ children, displayLoader, skip, variables }) => {
-    const pushMessage = useNotifier();
+    const notify = useNotifier();
     const [, dispatchAppState] = useAppState();
     const intl = useIntl();
+    const user = useUser();
 
     return (
       <Query
@@ -80,14 +83,19 @@ export function TypedQuery<TData, TVariables>(
       >
         {(queryData: QueryResult<TData, TVariables>) => {
           if (queryData.error) {
-            if (
+            if (queryData.error.graphQLErrors.some(isJwtError)) {
+              user.logout();
+              notify({
+                text: intl.formatMessage(commonMessages.sessionExpired)
+              });
+            } else if (
               !queryData.error.graphQLErrors.every(
                 err =>
                   maybe(() => err.extensions.exception.code) ===
                   "PermissionDenied"
               )
             ) {
-              pushMessage({
+              notify({
                 text: intl.formatMessage(commonMessages.somethingWentWrong)
               });
             }

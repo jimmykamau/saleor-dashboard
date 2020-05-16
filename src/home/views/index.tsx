@@ -1,7 +1,7 @@
-import React from "react";
-
 import useNavigator from "@saleor/hooks/useNavigator";
 import useUser from "@saleor/hooks/useUser";
+import React from "react";
+
 import { getUserName, maybe } from "../../misc";
 import { orderListUrl } from "../../orders/urls";
 import { productListUrl, productVariantEditUrl } from "../../products/urls";
@@ -53,7 +53,7 @@ const HomeSection = () => {
           ordersToFulfill={maybe(() => data.ordersToFulfill.totalCount)}
           productsOutOfStock={maybe(() => data.productsOutOfStock.totalCount)}
           userName={getUserName(user, true)}
-          userPermissions={maybe(() => user.permissions, [])}
+          userPermissions={user?.userPermissions || []}
         />
       )}
     </HomePageQuery>

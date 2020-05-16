@@ -1,14 +1,14 @@
+import configureIcon from "@assets/images/menu-configure-icon.svg";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
+import useTheme from "@saleor/hooks/useTheme";
+import { sectionNames } from "@saleor/intl";
 import classNames from "classnames";
 import React from "react";
 import SVG from "react-inlinesvg";
 import { FormattedMessage, useIntl } from "react-intl";
 import { matchPath } from "react-router";
 
-import configureIcon from "@assets/images/menu-configure-icon.svg";
-import useTheme from "@saleor/hooks/useTheme";
-import { sectionNames } from "@saleor/intl";
 import { User } from "../../auth/types/User";
 import {
   configurationMenuUrl,
@@ -195,7 +195,7 @@ const MenuList: React.FC<MenuListProps> = props => {
 
   const configutationMenu = createConfigurationMenu(intl).map(menu => {
     menu.menuItems.map(item =>
-      user.permissions.map(perm => perm.code).includes(item.permission)
+      user.userPermissions.map(perm => perm.code).includes(item.permission)
     );
   });
 
@@ -238,7 +238,9 @@ const MenuList: React.FC<MenuListProps> = props => {
 
         if (
           menuItem.permission &&
-          !user.permissions.map(perm => perm.code).includes(menuItem.permission)
+          !user.userPermissions
+            .map(perm => perm.code)
+            .includes(menuItem.permission)
         ) {
           return null;
         }

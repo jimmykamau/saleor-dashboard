@@ -1,3 +1,7 @@
+import { isJwtError } from "@saleor/auth/errors";
+import { commonMessages } from "@saleor/intl";
+import { getMutationStatus, maybe } from "@saleor/misc";
+import { MutationResultAdditionalProps } from "@saleor/types";
 import { ApolloError } from "apollo-client";
 import { DocumentNode } from "graphql";
 import {
@@ -7,10 +11,8 @@ import {
 } from "react-apollo";
 import { useIntl } from "react-intl";
 
-import { commonMessages } from "@saleor/intl";
-import { maybe, getMutationStatus } from "@saleor/misc";
-import { MutationResultAdditionalProps } from "@saleor/types";
 import useNotifier from "./useNotifier";
+import useUser from "./useUser";
 
 export type UseMutation<TData, TVariables> = [
   MutationFunction<TData, TVariables>,
@@ -33,6 +35,8 @@ function makeMutation<TData, TVariables>(
   }: UseMutationCbs<TData>): UseMutation<TData, TVariables> {
     const notify = useNotifier();
     const intl = useIntl();
+    const user = useUser();
+
     const [mutateFn, result] = useBaseMutation(mutation, {
       onCompleted,
       onError: (err: ApolloError) => {
@@ -45,6 +49,11 @@ function makeMutation<TData, TVariables>(
         ) {
           notify({
             text: intl.formatMessage(commonMessages.readOnly)
+          });
+        } else if (err.graphQLErrors.some(isJwtError)) {
+          user.logout();
+          notify({
+            text: intl.formatMessage(commonMessages.sessionExpired)
           });
         } else {
           notify({

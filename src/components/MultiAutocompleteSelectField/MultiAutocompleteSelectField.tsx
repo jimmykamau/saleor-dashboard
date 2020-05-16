@@ -1,17 +1,18 @@
 import IconButton from "@material-ui/core/IconButton";
 import { makeStyles } from "@material-ui/core/styles";
+import { fade } from "@material-ui/core/styles/colorManipulator";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import CloseIcon from "@material-ui/icons/Close";
+import Debounce, { DebounceProps } from "@saleor/components/Debounce";
+import ArrowDropdownIcon from "@saleor/icons/ArrowDropdown";
+import { FetchMoreProps } from "@saleor/types";
 import Downshift, { ControllerStateAndHelpers } from "downshift";
 import { filter } from "fuzzaldrin";
 import React from "react";
 
-import { fade } from "@material-ui/core/styles/colorManipulator";
-import Debounce, { DebounceProps } from "@saleor/components/Debounce";
-import ArrowDropdownIcon from "@saleor/icons/ArrowDropdown";
-import { FetchMoreProps } from "@saleor/types";
 import MultiAutocompleteSelectFieldContent, {
+  MultiAutocompleteActionType,
   MultiAutocompleteChoiceType
 } from "./MultiAutocompleteSelectFieldContent";
 
@@ -50,6 +51,20 @@ const useStyles = makeStyles(
     container: {
       flexGrow: 1,
       position: "relative"
+    },
+    disabledChipInner: {
+      "& svg": {
+        color: theme.palette.grey[200]
+      },
+      alignItems: "center",
+      background: fade(theme.palette.grey[400], 0.8),
+      borderRadius: 18,
+      color: theme.palette.primary.contrastText,
+      display: "flex",
+      justifyContent: "space-between",
+      margin: theme.spacing(1, 0),
+      paddingLeft: theme.spacing(2),
+      paddingRight: theme.spacing(1)
     }
   }),
   { name: "MultiAutocompleteSelectField" }
@@ -57,6 +72,7 @@ const useStyles = makeStyles(
 
 export interface MultiAutocompleteSelectFieldProps
   extends Partial<FetchMoreProps> {
+  add?: MultiAutocompleteActionType;
   allowCustomValues?: boolean;
   displayValues: MultiAutocompleteChoiceType[];
   error?: boolean;
@@ -77,6 +93,7 @@ const DebounceAutocomplete: React.ComponentType<DebounceProps<
 
 const MultiAutocompleteSelectFieldComponent: React.FC<MultiAutocompleteSelectFieldProps> = props => {
   const {
+    add,
     allowCustomValues,
     choices,
     displayValues,
@@ -115,6 +132,7 @@ const MultiAutocompleteSelectFieldComponent: React.FC<MultiAutocompleteSelectFie
         itemToString={() => ""}
       >
         {({
+          closeMenu,
           getInputProps,
           getItemProps,
           isOpen,
@@ -152,6 +170,13 @@ const MultiAutocompleteSelectFieldComponent: React.FC<MultiAutocompleteSelectFie
               />
               {isOpen && (!!inputValue || !!choices.length) && (
                 <MultiAutocompleteSelectFieldContent
+                  add={{
+                    ...add,
+                    onClick: () => {
+                      add.onClick();
+                      closeMenu();
+                    }
+                  }}
                   choices={choices.filter(
                     choice => !value.includes(choice.value)
                   )}
@@ -172,12 +197,18 @@ const MultiAutocompleteSelectFieldComponent: React.FC<MultiAutocompleteSelectFie
       <div className={classes.chipContainer}>
         {displayValues.map(value => (
           <div className={classes.chip} key={value.value}>
-            <div className={classes.chipInner}>
+            <div
+              className={
+                !value.disabled ? classes.chipInner : classes.disabledChipInner
+              }
+            >
               <Typography className={classes.chipLabel}>
                 {value.label}
               </Typography>
+
               <IconButton
                 className={classes.chipClose}
+                disabled={value.disabled}
                 onClick={() => handleSelect(value.value)}
               >
                 <CloseIcon fontSize="small" />

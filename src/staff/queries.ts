@@ -1,5 +1,6 @@
-import gql from "graphql-tag";
 import makeQuery from "@saleor/hooks/makeQuery";
+import gql from "graphql-tag";
+
 import { TypedQuery } from "../queries";
 import { StaffList, StaffListVariables } from "./types/StaffList";
 import {
@@ -23,7 +24,12 @@ export const staffMemberDetailsFragment = gql`
   ${staffMemberFragment}
   fragment StaffMemberDetailsFragment on User {
     ...StaffMemberFragment
-    permissions {
+    permissionGroups {
+      id
+      name
+      userCanManage
+    }
+    userPermissions {
       code
       name
     }

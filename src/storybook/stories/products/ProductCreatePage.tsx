@@ -1,8 +1,9 @@
+import { fetchMoreProps } from "@saleor/fixtures";
+import { ProductErrorCode } from "@saleor/types/globalTypes";
+import { warehouseList } from "@saleor/warehouses/fixtures";
 import { storiesOf } from "@storybook/react";
 import React from "react";
 
-import { fetchMoreProps } from "@saleor/fixtures";
-import { ProductErrorCode } from "@saleor/types/globalTypes";
 import ProductCreatePage, {
   ProductCreatePageSubmitData
 } from "../../../products/components/ProductCreatePage";
@@ -32,6 +33,7 @@ storiesOf("Views / Products / Create product", module)
       onBack={() => undefined}
       onSubmit={() => undefined}
       saveButtonBarState="default"
+      warehouses={warehouseList}
     />
   ))
   .add("When loading", () => (
@@ -52,6 +54,7 @@ storiesOf("Views / Products / Create product", module)
       onBack={() => undefined}
       onSubmit={() => undefined}
       saveButtonBarState="default"
+      warehouses={undefined}
     />
   ))
   .add("form errors", () => (
@@ -78,5 +81,6 @@ storiesOf("Views / Products / Create product", module)
       onBack={() => undefined}
       onSubmit={() => undefined}
       saveButtonBarState="default"
+      warehouses={warehouseList}
     />
   ));

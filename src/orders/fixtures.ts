@@ -1,5 +1,7 @@
 import { SearchCustomers_search_edges_node } from "@saleor/searches/types/SearchCustomers";
+import { warehouseList } from "@saleor/warehouses/fixtures";
 import { MessageDescriptor } from "react-intl";
+
 import { transformOrderStatus, transformPaymentStatus } from "../misc";
 import {
   FulfillmentStatus,
@@ -865,7 +867,8 @@ export const order = (placeholder: string): OrderDetails_order => ({
         }
       ],
       status: FulfillmentStatus.FULFILLED,
-      trackingNumber: ""
+      trackingNumber: "",
+      warehouse: warehouseList[1]
     },
     {
       __typename: "Fulfillment",
@@ -905,7 +908,8 @@ export const order = (placeholder: string): OrderDetails_order => ({
         }
       ],
       status: FulfillmentStatus.FULFILLED,
-      trackingNumber: ""
+      trackingNumber: "01nn12399su12nndfsy",
+      warehouse: warehouseList[0]
     }
   ],
   id: "T3JkZXI6OQ==",

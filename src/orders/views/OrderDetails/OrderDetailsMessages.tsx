@@ -1,13 +1,12 @@
-import React from "react";
-import { useIntl } from "react-intl";
-
 import useNavigator from "@saleor/hooks/useNavigator";
 import useNotifier from "@saleor/hooks/useNotifier";
 import createDialogActionHandlers from "@saleor/utils/handlers/dialogActionHandlers";
+import React from "react";
+import { useIntl } from "react-intl";
+
 import { OrderAddNote } from "../../types/OrderAddNote";
 import { OrderCancel } from "../../types/OrderCancel";
 import { OrderCapture } from "../../types/OrderCapture";
-import { OrderCreateFulfillment } from "../../types/OrderCreateFulfillment";
 import { OrderDraftCancel } from "../../types/OrderDraftCancel";
 import { OrderDraftFinalize } from "../../types/OrderDraftFinalize";
 import { OrderDraftUpdate } from "../../types/OrderDraftUpdate";
@@ -31,7 +30,6 @@ interface OrderDetailsMessages {
     handleNoteAdd: (data: OrderAddNote) => void;
     handleOrderCancel: (data: OrderCancel) => void;
     handleOrderFulfillmentCancel: (data: OrderFulfillmentCancel) => void;
-    handleOrderFulfillmentCreate: (data: OrderCreateFulfillment) => void;
     handleOrderFulfillmentUpdate: (
       data: OrderFulfillmentUpdateTracking
     ) => void;
@@ -81,17 +79,6 @@ export const OrderDetailsMessages: React.FC<OrderDetailsMessages> = ({
       pushMessage({
         text: intl.formatMessage({
           defaultMessage: "Payment successfully refunded"
-        })
-      });
-      closeModal();
-    }
-  };
-  const handleOrderFulfillmentCreate = (data: OrderCreateFulfillment) => {
-    const errs = data.orderFulfillmentCreate?.errors;
-    if (errs.length === 0) {
-      pushMessage({
-        text: intl.formatMessage({
-          defaultMessage: "Items successfully fulfilled"
         })
       });
       closeModal();
@@ -256,7 +243,6 @@ export const OrderDetailsMessages: React.FC<OrderDetailsMessages> = ({
     handleNoteAdd,
     handleOrderCancel,
     handleOrderFulfillmentCancel,
-    handleOrderFulfillmentCreate,
     handleOrderFulfillmentUpdate,
     handleOrderLineDelete,
     handleOrderLineUpdate,

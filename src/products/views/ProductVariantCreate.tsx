@@ -1,30 +1,39 @@
-import React from "react";
-import { useIntl } from "react-intl";
-
+import NotFoundPage from "@saleor/components/NotFoundPage";
 import { WindowTitle } from "@saleor/components/WindowTitle";
 import useNavigator from "@saleor/hooks/useNavigator";
 import useNotifier from "@saleor/hooks/useNotifier";
 import useShop from "@saleor/hooks/useShop";
-import NotFoundPage from "@saleor/components/NotFoundPage";
 import { commonMessages } from "@saleor/intl";
-import { decimal, maybe } from "../../misc";
+import { useWarehouseList } from "@saleor/warehouses/queries";
+import React from "react";
+import { useIntl } from "react-intl";
+
+import { decimal } from "../../misc";
 import ProductVariantCreatePage, {
   ProductVariantCreatePageSubmitData
 } from "../components/ProductVariantCreatePage";
 import { TypedVariantCreateMutation } from "../mutations";
 import { TypedProductVariantCreateQuery } from "../queries";
 import { VariantCreate } from "../types/VariantCreate";
-import { productUrl, productVariantEditUrl, productListUrl } from "../urls";
+import { productListUrl, productUrl, productVariantEditUrl } from "../urls";
 
-interface ProductUpdateProps {
+interface ProductVariantCreateProps {
   productId: string;
 }
 
-export const ProductVariant: React.FC<ProductUpdateProps> = ({ productId }) => {
+export const ProductVariant: React.FC<ProductVariantCreateProps> = ({
+  productId
+}) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const shop = useShop();
   const intl = useIntl();
+  const warehouses = useWarehouseList({
+    displayLoader: true,
+    variables: {
+      first: 50
+    }
+  });
 
   return (
     <TypedProductVariantCreateQuery displayLoader variables={{ id: productId }}>
@@ -68,8 +77,11 @@ export const ProductVariant: React.FC<ProductUpdateProps> = ({ productId }) => {
                       costPrice: decimal(formData.costPrice),
                       priceOverride: decimal(formData.priceOverride),
                       product: productId,
-                      quantity: parseInt(formData.quantity, 0),
                       sku: formData.sku,
+                      stocks: formData.stocks.map(stock => ({
+                        quantity: parseInt(stock.value, 0),
+                        warehouse: stock.id
+                      })),
                       trackInventory: true
                     }
                   }
@@ -88,7 +100,8 @@ export const ProductVariant: React.FC<ProductUpdateProps> = ({ productId }) => {
                     })}
                   />
                   <ProductVariantCreatePage
-                    currencySymbol={maybe(() => shop.defaultCurrency)}
+                    currencySymbol={shop?.defaultCurrency}
+                    disabled={disableForm}
                     errors={
                       variantCreateResult.data?.productVariantCreate.errors ||
                       []
@@ -97,12 +110,16 @@ export const ProductVariant: React.FC<ProductUpdateProps> = ({ productId }) => {
                       defaultMessage: "Create Variant",
                       description: "header"
                     })}
-                    loading={disableForm}
                     product={data?.product}
                     onBack={handleBack}
                     onSubmit={handleSubmit}
                     onVariantClick={handleVariantClick}
                     saveButtonBarState={variantCreateResult.status}
+                    warehouses={
+                      warehouses.data?.warehouses.edges.map(
+                        edge => edge.node
+                      ) || []
+                    }
                   />
                 </>
               );

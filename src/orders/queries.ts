@@ -1,13 +1,17 @@
+import makeQuery from "@saleor/hooks/makeQuery";
+import makeTopLevelSearch from "@saleor/hooks/makeTopLevelSearch";
 import gql from "graphql-tag";
 
-import makeTopLevelSearch from "@saleor/hooks/makeTopLevelSearch";
-import makeQuery from "@saleor/hooks/makeQuery";
 import { TypedQuery } from "../queries";
 import { OrderDetails, OrderDetailsVariables } from "./types/OrderDetails";
 import {
   OrderDraftList,
   OrderDraftListVariables
 } from "./types/OrderDraftList";
+import {
+  OrderFulfillData,
+  OrderFulfillDataVariables
+} from "./types/OrderFulfillData";
 import { OrderList, OrderListVariables } from "./types/OrderList";
 import {
   SearchOrderVariant as SearchOrderVariantType,
@@ -73,11 +77,32 @@ export const fragmentOrderLine = gql`
     }
   }
 `;
+export const fulfillmentFragment = gql`
+  ${fragmentOrderLine}
+  fragment FulfillmentFragment on Fulfillment {
+    id
+    lines {
+      id
+      quantity
+      orderLine {
+        ...OrderLineFragment
+      }
+    }
+    fulfillmentOrder
+    status
+    trackingNumber
+    warehouse {
+      id
+      name
+    }
+  }
+`;
 
 export const fragmentOrderDetails = gql`
   ${fragmentAddress}
   ${fragmentOrderEvent}
   ${fragmentOrderLine}
+  ${fulfillmentFragment}
   fragment OrderDetailsFragment on Order {
     id
     billingAddress {
@@ -90,17 +115,7 @@ export const fragmentOrderDetails = gql`
       ...OrderEventFragment
     }
     fulfillments {
-      id
-      lines {
-        id
-        quantity
-        orderLine {
-          ...OrderLineFragment
-        }
-      }
-      fulfillmentOrder
-      status
-      trackingNumber
+      ...FulfillmentFragment
     }
     lines {
       ...OrderLineFragment
@@ -327,3 +342,46 @@ export const useOrderVariantSearch = makeTopLevelSearch<
   SearchOrderVariantType,
   SearchOrderVariantVariables
 >(searchOrderVariant);
+
+const orderFulfillData = gql`
+  query OrderFulfillData($orderId: ID!) {
+    order(id: $orderId) {
+      id
+      lines {
+        id
+        isShippingRequired
+        productName
+        quantity
+        quantityFulfilled
+        variant {
+          id
+          name
+          sku
+          attributes {
+            values {
+              id
+              name
+            }
+          }
+          stocks {
+            id
+            warehouse {
+              id
+            }
+            quantity
+            quantityAllocated
+          }
+          trackInventory
+        }
+        thumbnail(size: 64) {
+          url
+        }
+      }
+      number
+    }
+  }
+`;
+export const useOrderFulfillData = makeQuery<
+  OrderFulfillData,
+  OrderFulfillDataVariables
+>(orderFulfillData);

@@ -97,10 +97,6 @@ function loadStories() {
   require("./stories/navigation/MenuItemDialog");
   require("./stories/navigation/MenuListPage");
 
-  // Staff
-  require("./stories/staff/StaffListPage");
-  require("./stories/staff/StaffDetailsPage");
-
   // Pages
   require("./stories/pages/PageDetailsPage");
   require("./stories/pages/PageListPage");

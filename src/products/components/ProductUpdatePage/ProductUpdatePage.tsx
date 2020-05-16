@@ -1,7 +1,4 @@
-import { convertFromRaw, RawDraftContentState } from "draft-js";
-import React from "react";
-import { useIntl } from "react-intl";
-
+import { ProductErrorFragment } from "@saleor/attributes/types/ProductErrorFragment";
 import AppHeader from "@saleor/components/AppHeader";
 import CardSpacer from "@saleor/components/CardSpacer";
 import { ConfirmButtonTransitionState } from "@saleor/components/ConfirmButton";
@@ -22,7 +19,12 @@ import { SearchCollections_search_edges_node } from "@saleor/searches/types/Sear
 import { FetchMoreProps, ListActions } from "@saleor/types";
 import createMultiAutocompleteSelectHandler from "@saleor/utils/handlers/multiAutocompleteSelectChangeHandler";
 import createSingleAutocompleteSelectHandler from "@saleor/utils/handlers/singleAutocompleteSelectChangeHandler";
-import { ProductErrorFragment } from "@saleor/attributes/types/ProductErrorFragment";
+import { WarehouseFragment } from "@saleor/warehouses/types/WarehouseFragment";
+import { convertFromRaw, RawDraftContentState } from "draft-js";
+import { diff } from "fast-array-diff";
+import React from "react";
+import { useIntl } from "react-intl";
+
 import {
   ProductDetails_product,
   ProductDetails_product_images,
@@ -33,6 +35,7 @@ import {
   getChoices,
   getProductUpdatePageFormData,
   getSelectedAttributesFromProduct,
+  getStockInputFromProduct,
   ProductAttributeValueChoices,
   ProductUpdatePageFormData
 } from "../../utils/data";
@@ -45,7 +48,7 @@ import ProductDetailsForm from "../ProductDetailsForm";
 import ProductImages from "../ProductImages";
 import ProductOrganization from "../ProductOrganization";
 import ProductPricing from "../ProductPricing";
-import ProductStock from "../ProductStock";
+import ProductStocks, { ProductStockInput } from "../ProductStocks";
 import ProductVariants from "../ProductVariants";
 
 export interface ProductUpdatePageProps extends ListActions {
@@ -61,6 +64,7 @@ export interface ProductUpdatePageProps extends ListActions {
   product: ProductDetails_product;
   header: string;
   saveButtonBarState: ConfirmButtonTransitionState;
+  warehouses: WarehouseFragment[];
   fetchCategories: (query: string) => void;
   fetchCollections: (query: string) => void;
   onVariantsAdd: () => void;
@@ -71,7 +75,6 @@ export interface ProductUpdatePageProps extends ListActions {
   onImageEdit?(id: string);
   onImageReorder?(event: { oldIndex: number; newIndex: number });
   onImageUpload(file: File);
-  onProductShow?();
   onSeoClick?();
   onSubmit?(data: ProductUpdatePageSubmitData);
   onVariantAdd?();
@@ -80,6 +83,9 @@ export interface ProductUpdatePageProps extends ListActions {
 export interface ProductUpdatePageSubmitData extends ProductUpdatePageFormData {
   attributes: ProductAttributeInput[];
   collections: string[];
+  addStocks: ProductStockInput[];
+  updateStocks: ProductStockInput[];
+  removeStocks: string[];
 }
 
 export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
@@ -97,6 +103,7 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
   product,
   saveButtonBarState,
   variants,
+  warehouses,
   onBack,
   onDelete,
   onImageDelete,
@@ -120,9 +127,18 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
     () => getAttributeInputFromProduct(product),
     [product]
   );
+  const stockInput = React.useMemo(() => getStockInputFromProduct(product), [
+    product
+  ]);
   const { change: changeAttributeData, data: attributes } = useFormset(
     attributeInput
   );
+  const {
+    add: addStock,
+    change: changeStockData,
+    data: stocks,
+    remove: removeStock
+  } = useFormset(stockInput);
 
   const [selectedAttributes, setSelectedAttributes] = useStateFromProps<
     ProductAttributeValueChoices[]
@@ -146,11 +162,25 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
   const currency = maybe(() => product.basePrice.currency);
   const hasVariants = maybe(() => product.productType.hasVariants, false);
 
-  const handleSubmit = (data: ProductUpdatePageFormData) =>
+  const handleSubmit = (data: ProductUpdatePageFormData) => {
+    const dataStocks = stocks.map(stock => stock.id);
+    const variantStocks = product.variants[0].stocks.map(
+      stock => stock.warehouse.id
+    );
+    const stockDiff = diff(variantStocks, dataStocks);
+
     onSubmit({
+      ...data,
+      addStocks: stocks.filter(stock =>
+        stockDiff.added.some(addedStock => addedStock === stock.id)
+      ),
       attributes,
-      ...data
+      removeStocks: stockDiff.removed,
+      updateStocks: stocks.filter(
+        stock => !stockDiff.added.some(addedStock => addedStock === stock.id)
+      )
     });
+  };
 
   return (
     <Form onSubmit={handleSubmit} initial={initialData} confirmLeave>
@@ -239,12 +269,32 @@ export const ProductUpdatePage: React.FC<ProductUpdatePageProps> = ({
                       toggleAll={toggleAll}
                     />
                   ) : (
-                    <ProductStock
+                    <ProductStocks
                       data={data}
                       disabled={disabled}
-                      product={product}
-                      onChange={change}
                       errors={errors}
+                      stocks={stocks}
+                      warehouses={warehouses}
+                      onChange={(id, value) => {
+                        triggerChange();
+                        changeStockData(id, value);
+                      }}
+                      onFormDataChange={change}
+                      onWarehouseStockAdd={id => {
+                        triggerChange();
+                        addStock({
+                          data: null,
+                          id,
+                          label: warehouses.find(
+                            warehouse => warehouse.id === id
+                          ).name,
+                          value: "0"
+                        });
+                      }}
+                      onWarehouseStockDelete={id => {
+                        triggerChange();
+                        removeStock(id);
+                      }}
                     />
                   )}
                   <CardSpacer />

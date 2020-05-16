@@ -5,6 +5,7 @@ import { ProductImageCreateVariables } from "@saleor/products/types/ProductImage
 import { ProductImageReorderVariables } from "@saleor/products/types/ProductImageReorder";
 import { ProductUpdateVariables } from "@saleor/products/types/ProductUpdate";
 import { SimpleProductUpdateVariables } from "@saleor/products/types/SimpleProductUpdate";
+import { mapFormsetStockToStockInput } from "@saleor/products/utils/data";
 import { ReorderEvent } from "@saleor/types";
 import { arrayMove } from "react-sortable-hoc";
 
@@ -40,11 +41,14 @@ export function createUpdateHandler(
     } else {
       updateSimpleProduct({
         ...productVariables,
+        addStocks: data.addStocks.map(mapFormsetStockToStockInput),
+        deleteStocks: data.removeStocks,
         productVariantId: product.variants[0].id,
         productVariantInput: {
-          quantity: data.stockQuantity,
-          sku: data.sku
-        }
+          sku: data.sku,
+          trackInventory: data.trackInventory
+        },
+        updateStocks: data.updateStocks.map(mapFormsetStockToStockInput)
       });
     }
   };

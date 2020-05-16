@@ -14,8 +14,8 @@ export interface SetPassword_setPassword_errors {
   field: string | null;
 }
 
-export interface SetPassword_setPassword_user_permissions {
-  __typename: "PermissionDisplay";
+export interface SetPassword_setPassword_user_userPermissions {
+  __typename: "UserPermission";
   code: PermissionEnum;
   name: string;
 }
@@ -31,13 +31,13 @@ export interface SetPassword_setPassword_user {
   email: string;
   firstName: string;
   lastName: string;
-  permissions: (SetPassword_setPassword_user_permissions | null)[] | null;
+  userPermissions: (SetPassword_setPassword_user_userPermissions | null)[] | null;
   avatar: SetPassword_setPassword_user_avatar | null;
 }
 
 export interface SetPassword_setPassword {
   __typename: "SetPassword";
-  errors: SetPassword_setPassword_errors[] | null;
+  errors: SetPassword_setPassword_errors[];
   token: string | null;
   user: SetPassword_setPassword_user | null;
 }

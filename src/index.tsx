@@ -1,3 +1,5 @@
+import Navigator from "@saleor/components/Navigator";
+import useAppState from "@saleor/hooks/useAppState";
 import { defaultDataIdFromObject, InMemoryCache } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import { ApolloLink } from "apollo-link";
@@ -12,14 +14,13 @@ import ErrorBoundary from "react-error-boundary";
 import { useIntl } from "react-intl";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 
-import Navigator from "@saleor/components/Navigator";
-import useAppState from "@saleor/hooks/useAppState";
 import AttributeSection from "./attributes";
 import { attributeSection } from "./attributes/urls";
 import Auth, { getAuthToken, removeAuthToken } from "./auth";
 import AuthProvider from "./auth/AuthProvider";
 import LoginLoading from "./auth/components/LoginLoading/LoginLoading";
 import SectionRoute from "./auth/components/SectionRoute";
+import { isJwtError } from "./auth/errors";
 import { hasPermission } from "./auth/misc";
 import CategorySection from "./categories";
 import CollectionSection from "./collections";
@@ -42,6 +43,7 @@ import { navigationSection } from "./navigation/urls";
 import { NotFound } from "./NotFound";
 import OrdersSection from "./orders";
 import PageSection from "./pages";
+import PermissionGroupSection from "./permissionGroups";
 import PluginsSection from "./plugins";
 import ProductSection from "./products";
 import ProductTypesSection from "./productTypes";
@@ -53,6 +55,8 @@ import StaffSection from "./staff";
 import TaxesSection from "./taxes";
 import TranslationsSection from "./translations";
 import { PermissionEnum } from "./types/globalTypes";
+import WarehouseSection from "./warehouses";
+import { warehouseSection } from "./warehouses/urls";
 import WebhooksSection from "./webhooks";
 
 interface ResponseError extends ErrorResponse {
@@ -63,7 +67,10 @@ interface ResponseError extends ErrorResponse {
 }
 
 const invalidTokenLink = onError((error: ResponseError) => {
-  if (error.networkError && error.networkError.statusCode === 401) {
+  if (
+    (error.networkError && error.networkError.statusCode === 401) ||
+    error.graphQLErrors?.some(isJwtError)
+  ) {
     removeAuthToken();
   }
 });
@@ -218,6 +225,11 @@ const Routes: React.FC = () => {
                     component={StaffSection}
                   />
                   <SectionRoute
+                    permissions={[PermissionEnum.MANAGE_STAFF]}
+                    path="/permission-groups"
+                    component={PermissionGroupSection}
+                  />
+                  <SectionRoute
                     permissions={[PermissionEnum.MANAGE_SETTINGS]}
                     path="/site-settings"
                     component={SiteSettingsSection}
@@ -253,9 +265,14 @@ const Routes: React.FC = () => {
                     component={AttributeSection}
                   />
                   <SectionRoute
-                    permissions={[PermissionEnum.MANAGE_SERVICE_ACCOUNTS]}
+                    permissions={[PermissionEnum.MANAGE_APPS]}
                     path={serviceSection}
                     component={ServiceSection}
+                  />
+                  <SectionRoute
+                    permissions={[PermissionEnum.MANAGE_PRODUCTS]}
+                    path={warehouseSection}
+                    component={WarehouseSection}
                   />
                   {createConfigurationMenu(intl).filter(menu =>
                     menu.menuItems.map(item =>

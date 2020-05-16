@@ -1,8 +1,9 @@
+import placeholderImage from "@assets/images/placeholder60x60.png";
+import { ProductErrorCode } from "@saleor/types/globalTypes";
+import { warehouseList } from "@saleor/warehouses/fixtures";
 import { storiesOf } from "@storybook/react";
 import React from "react";
 
-import placeholderImage from "@assets/images/placeholder60x60.png";
-import { ProductErrorCode } from "@saleor/types/globalTypes";
 import ProductVariantPage from "../../../products/components/ProductVariantPage";
 import { variant as variantFixture } from "../../../products/fixtures";
 import Decorator from "../../Decorator";
@@ -23,6 +24,7 @@ storiesOf("Views / Products / Product variant details", module)
       onSubmit={() => undefined}
       onVariantClick={() => undefined}
       saveButtonBarState="default"
+      warehouses={warehouseList}
     />
   ))
   .add("when loading data", () => (
@@ -38,6 +40,7 @@ storiesOf("Views / Products / Product variant details", module)
       onSubmit={() => undefined}
       onVariantClick={() => undefined}
       saveButtonBarState="default"
+      warehouses={warehouseList}
     />
   ))
   .add("attribute errors", () => (
@@ -69,5 +72,6 @@ storiesOf("Views / Products / Product variant details", module)
         message: "Generic form error",
         ...error
       }))}
+      warehouses={warehouseList}
     />
   ));

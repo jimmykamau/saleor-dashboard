@@ -1,6 +1,3 @@
-import React from "react";
-import { useIntl } from "react-intl";
-
 import { WindowTitle } from "@saleor/components/WindowTitle";
 import { DEFAULT_INITIAL_SEARCH_DATA } from "@saleor/config";
 import useNavigator from "@saleor/hooks/useNavigator";
@@ -9,6 +6,10 @@ import useShop from "@saleor/hooks/useShop";
 import useCategorySearch from "@saleor/searches/useCategorySearch";
 import useCollectionSearch from "@saleor/searches/useCollectionSearch";
 import useProductTypeSearch from "@saleor/searches/useProductTypeSearch";
+import { useWarehouseList } from "@saleor/warehouses/queries";
+import React from "react";
+import { useIntl } from "react-intl";
+
 import { decimal, maybe } from "../../misc";
 import ProductCreatePage, {
   ProductCreatePageSubmitData
@@ -17,11 +18,7 @@ import { TypedProductCreateMutation } from "../mutations";
 import { ProductCreate } from "../types/ProductCreate";
 import { productListUrl, productUrl } from "../urls";
 
-interface ProductUpdateProps {
-  id: string;
-}
-
-export const ProductUpdate: React.FC<ProductUpdateProps> = () => {
+export const ProductCreateView: React.FC = () => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const shop = useShop();
@@ -46,6 +43,12 @@ export const ProductUpdate: React.FC<ProductUpdateProps> = () => {
     result: searchProductTypesOpts
   } = useProductTypeSearch({
     variables: DEFAULT_INITIAL_SEARCH_DATA
+  });
+  const warehouses = useWarehouseList({
+    displayLoader: true,
+    variables: {
+      first: 50
+    }
   });
 
   const handleBack = () => navigate(productListUrl());
@@ -88,8 +91,11 @@ export const ProductUpdate: React.FC<ProductUpdateProps> = () => {
                 title: formData.seoTitle
               },
               sku: formData.sku,
-              stockQuantity:
-                formData.stockQuantity !== null ? formData.stockQuantity : 0
+              stocks: formData.stocks.map(stock => ({
+                quantity: parseInt(stock.value, 0),
+                warehouse: stock.id
+              })),
+              trackInventory: formData.trackInventory
             }
           });
         };
@@ -148,6 +154,9 @@ export const ProductUpdate: React.FC<ProductUpdateProps> = () => {
                 loading: searchProductTypesOpts.loading,
                 onFetchMore: loadMoreProductTypes
               }}
+              warehouses={
+                warehouses.data?.warehouses.edges.map(edge => edge.node) || []
+              }
             />
           </>
         );
@@ -155,4 +164,4 @@ export const ProductUpdate: React.FC<ProductUpdateProps> = () => {
     </TypedProductCreateMutation>
   );
 };
-export default ProductUpdate;
+export default ProductCreateView;

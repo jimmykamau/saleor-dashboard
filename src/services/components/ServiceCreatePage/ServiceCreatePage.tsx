@@ -1,6 +1,3 @@
-import React from "react";
-import { useIntl } from "react-intl";
-
 import AccountPermissions from "@saleor/components/AccountPermissions";
 import AccountStatus from "@saleor/components/AccountStatus";
 import AppHeader from "@saleor/components/AppHeader";
@@ -12,9 +9,14 @@ import Grid from "@saleor/components/Grid";
 import PageHeader from "@saleor/components/PageHeader";
 import SaveButtonBar from "@saleor/components/SaveButtonBar";
 import { ShopInfo_shop_permissions } from "@saleor/components/Shop/types/ShopInfo";
+import { AccountErrorFragment } from "@saleor/customers/types/AccountErrorFragment";
 import { sectionNames } from "@saleor/intl";
 import { PermissionEnum } from "@saleor/types/globalTypes";
-import { AccountErrorFragment } from "@saleor/customers/types/AccountErrorFragment";
+import { getFormErrors } from "@saleor/utils/errors";
+import getAccountErrorMessage from "@saleor/utils/errors/account";
+import React from "react";
+import { useIntl } from "react-intl";
+
 import ServiceInfo from "../ServiceInfo";
 
 export interface ServiceCreatePageFormData {
@@ -49,6 +51,10 @@ const ServiceCreatePage: React.FC<ServiceCreatePageProps> = props => {
     name: "",
     permissions: []
   };
+
+  const formErrors = getFormErrors(["permissions"], errors || []);
+  const permissionsError = getAccountErrorMessage(formErrors.permissions, intl);
+
   return (
     <Form initial={initialForm} onSubmit={onSubmit} confirmLeave>
       {({ data, change, hasChanged, submit }) => (
@@ -73,9 +79,20 @@ const ServiceCreatePage: React.FC<ServiceCreatePageProps> = props => {
             </div>
             <AccountPermissions
               data={data}
+              errorMessage={permissionsError}
               disabled={disabled}
               permissions={permissions}
+              permissionsExceeded={false}
               onChange={change}
+              fullAccessLabel={intl.formatMessage({
+                defaultMessage: "User has full access to the store",
+                description: "checkbox label"
+              })}
+              description={intl.formatMessage({
+                defaultMessage:
+                  "Expand or restrict user's permissions to access certain part of saleor system.",
+                description: "card description"
+              })}
             />
             <CardSpacer />
             <AccountStatus

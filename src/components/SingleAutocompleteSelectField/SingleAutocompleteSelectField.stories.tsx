@@ -1,12 +1,12 @@
-import { storiesOf } from "@storybook/react";
-import React from "react";
-
 import Form from "@saleor/components/Form";
 import { countries } from "@saleor/fixtures";
 import CardDecorator from "@saleor/storybook/CardDecorator";
 import Decorator from "@saleor/storybook/Decorator";
 import { ChoiceProvider } from "@saleor/storybook/mock";
 import createSingleAutocompleteSelectHandler from "@saleor/utils/handlers/singleAutocompleteSelectChangeHandler";
+import { storiesOf } from "@storybook/react";
+import React from "react";
+
 import SingleAutocompleteSelectField, {
   SingleAutocompleteSelectFieldProps
 } from "./SingleAutocompleteSelectField";
@@ -69,6 +69,7 @@ const Story: React.FC<Partial<
 };
 
 const contentProps: SingleAutocompleteSelectFieldContentProps = {
+  add: undefined,
   choices: suggestions.slice(0, 10),
   displayCustomValue: false,
   emptyOption: false,
@@ -87,6 +88,15 @@ storiesOf("Generics / Select with autocomplete", module)
   .addDecorator(Decorator)
   .add("default", () => (
     <SingleAutocompleteSelectFieldContent {...contentProps} />
+  ))
+  .add("with add", () => (
+    <SingleAutocompleteSelectFieldContent
+      {...contentProps}
+      add={{
+        label: "Add New Collection",
+        onClick: () => undefined
+      }}
+    />
   ))
   .add("can load more", () => (
     <SingleAutocompleteSelectFieldContent {...contentProps} hasMore={true} />

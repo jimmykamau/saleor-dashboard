@@ -1,13 +1,15 @@
+import { isJwtError } from "@saleor/auth/errors";
+import { commonMessages } from "@saleor/intl";
+import { maybe, RequireAtLeastOne } from "@saleor/misc";
 import { ApolloQueryResult } from "apollo-client";
 import { DocumentNode } from "graphql";
 import { useEffect } from "react";
 import { QueryResult, useQuery as useBaseQuery } from "react-apollo";
 import { useIntl } from "react-intl";
 
-import { commonMessages } from "@saleor/intl";
-import { maybe, RequireAtLeastOne } from "@saleor/misc";
 import useAppState from "./useAppState";
 import useNotifier from "./useNotifier";
+import useUser from "./useUser";
 
 export interface LoadMore<TData, TVariables> {
   loadMore: (
@@ -38,6 +40,8 @@ function makeQuery<TData, TVariables>(
     const notify = useNotifier();
     const intl = useIntl();
     const [, dispatchAppState] = useAppState();
+    const user = useUser();
+
     const queryData = useBaseQuery(query, {
       context: {
         useBatching: true
@@ -60,7 +64,12 @@ function makeQuery<TData, TVariables>(
     }, [queryData.loading]);
 
     if (queryData.error) {
-      if (
+      if (queryData.error.graphQLErrors.some(isJwtError)) {
+        user.logout();
+        notify({
+          text: intl.formatMessage(commonMessages.sessionExpired)
+        });
+      } else if (
         !queryData.error.graphQLErrors.every(
           err =>
             maybe(() => err.extensions.exception.code) === "PermissionDenied"

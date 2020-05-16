@@ -1,6 +1,3 @@
-import React from "react";
-import { IntlShape, useIntl } from "react-intl";
-
 import { attributeListUrl } from "@saleor/attributes/urls";
 import { WindowTitle } from "@saleor/components/WindowTitle";
 import useNavigator from "@saleor/hooks/useNavigator";
@@ -9,17 +6,20 @@ import Attributes from "@saleor/icons/Attributes";
 import Bot from "@saleor/icons/Bot";
 import Navigation from "@saleor/icons/Navigation";
 import Pages from "@saleor/icons/Pages";
+import PermissionGroups from "@saleor/icons/PermissionGroups";
 import Plugins from "@saleor/icons/Plugins";
 import ProductTypes from "@saleor/icons/ProductTypes";
 import ShippingMethods from "@saleor/icons/ShippingMethods";
 import SiteSettings from "@saleor/icons/SiteSettings";
 import StaffMembers from "@saleor/icons/StaffMembers";
 import Taxes from "@saleor/icons/Taxes";
+import Warehouses from "@saleor/icons/Warehouses";
 import Webhooks from "@saleor/icons/Webhooks";
 import { sectionNames } from "@saleor/intl";
 import { maybe } from "@saleor/misc";
 import { menuListUrl } from "@saleor/navigation/urls";
 import { pageListUrl } from "@saleor/pages/urls";
+import { permissionGroupListUrl } from "@saleor/permissionGroups/urls";
 import { pluginListUrl } from "@saleor/plugins/urls";
 import { productTypeListUrl } from "@saleor/productTypes/urls";
 import { serviceListUrl } from "@saleor/services/urls";
@@ -28,7 +28,11 @@ import { siteSettingsUrl } from "@saleor/siteSettings/urls";
 import { staffListUrl } from "@saleor/staff/urls";
 import { taxSection } from "@saleor/taxes/urls";
 import { PermissionEnum } from "@saleor/types/globalTypes";
+import { warehouseSection } from "@saleor/warehouses/urls";
 import { webhookListUrl } from "@saleor/webhooks/urls";
+import React from "react";
+import { IntlShape, useIntl } from "react-intl";
+
 import ConfigurationPage, { MenuSection } from "./ConfigurationPage";
 
 export function createConfigurationMenu(intl: IntlShape): MenuSection[] {
@@ -67,16 +71,6 @@ export function createConfigurationMenu(intl: IntlShape): MenuSection[] {
       menuItems: [
         {
           description: intl.formatMessage({
-            defaultMessage: "Manage how you ship out orders",
-            id: "configurationMenuShipping"
-          }),
-          icon: <ShippingMethods fontSize="inherit" viewBox="0 0 44 44" />,
-          permission: PermissionEnum.MANAGE_SHIPPING,
-          title: intl.formatMessage(sectionNames.shipping),
-          url: shippingZonesListUrl()
-        },
-        {
-          description: intl.formatMessage({
             defaultMessage: "Manage how your store charges tax",
             id: "configurationMenuTaxes"
           }),
@@ -101,6 +95,44 @@ export function createConfigurationMenu(intl: IntlShape): MenuSection[] {
           permission: PermissionEnum.MANAGE_STAFF,
           title: intl.formatMessage(sectionNames.staff),
           url: staffListUrl()
+        },
+        {
+          description: intl.formatMessage({
+            defaultMessage:
+              "Manage your permission groups and their permissions",
+            id: "configurationMenuPermissionGroups"
+          }),
+          icon: <PermissionGroups fontSize="inherit" viewBox="0 0 44 44" />,
+          permission: PermissionEnum.MANAGE_STAFF,
+          title: intl.formatMessage(sectionNames.permissionGroups),
+          url: permissionGroupListUrl()
+        }
+      ]
+    },
+    {
+      label: intl.formatMessage({
+        defaultMessage: "Shipping Settings"
+      }),
+      menuItems: [
+        {
+          description: intl.formatMessage({
+            defaultMessage: "Manage how you ship out orders",
+            id: "configurationMenuShipping"
+          }),
+          icon: <ShippingMethods fontSize="inherit" viewBox="0 0 44 44" />,
+          permission: PermissionEnum.MANAGE_SHIPPING,
+          title: intl.formatMessage(sectionNames.shipping),
+          url: shippingZonesListUrl()
+        },
+        {
+          description: intl.formatMessage({
+            defaultMessage: "Manage and update your warehouse information",
+            id: "configurationMenuWarehouses"
+          }),
+          icon: <Warehouses fontSize="inherit" viewBox="0 0 44 44" />,
+          permission: PermissionEnum.MANAGE_PRODUCTS,
+          title: intl.formatMessage(sectionNames.warehouses),
+          url: warehouseSection
         }
       ]
     },
@@ -160,7 +192,7 @@ export function createConfigurationMenu(intl: IntlShape): MenuSection[] {
             defaultMessage: "Manage external integrations accounts"
           }),
           icon: <Bot fontSize="inherit" viewBox="0 0 44 44" />,
-          permission: PermissionEnum.MANAGE_SERVICE_ACCOUNTS,
+          permission: PermissionEnum.MANAGE_APPS,
           title: intl.formatMessage(sectionNames.serviceAccounts),
           url: serviceListUrl()
         },
