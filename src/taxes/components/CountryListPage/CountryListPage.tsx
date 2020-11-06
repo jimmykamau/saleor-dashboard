@@ -1,6 +1,3 @@
-import React from "react";
-import { useIntl } from "react-intl";
-
 import AppHeader from "@saleor/components/AppHeader";
 import { ConfirmButtonTransitionState } from "@saleor/components/ConfirmButton";
 import { Container } from "@saleor/components/Container";
@@ -9,6 +6,9 @@ import Grid from "@saleor/components/Grid";
 import PageHeader from "@saleor/components/PageHeader";
 import SaveButtonBar from "@saleor/components/SaveButtonBar";
 import { sectionNames } from "@saleor/intl";
+import React from "react";
+import { useIntl } from "react-intl";
+
 import { maybe } from "../../../misc";
 import { CountryList_shop } from "../../types/CountryList";
 import CountryList from "../CountryList";
@@ -47,7 +47,7 @@ const CountryListPage: React.FC<CountryListPageProps> = ({
   };
   return (
     <Form initial={initialForm} onSubmit={onSubmit}>
-      {({ change, data, submit }) => (
+      {({ change, data, hasChanged, submit }) => (
         <>
           <Container>
             <AppHeader onBack={onBack}>
@@ -77,7 +77,7 @@ const CountryListPage: React.FC<CountryListPageProps> = ({
             </Grid>
           </Container>
           <SaveButtonBar
-            disabled={disabled}
+            disabled={disabled || !hasChanged}
             state={saveButtonBarState}
             onCancel={onBack}
             onSave={submit}

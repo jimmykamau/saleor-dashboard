@@ -7,9 +7,6 @@ import TableRow from "@material-ui/core/TableRow";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import DeleteIcon from "@material-ui/icons/Delete";
-import React from "react";
-import { FormattedMessage } from "react-intl";
-
 import { DebounceForm } from "@saleor/components/DebounceForm";
 import Form from "@saleor/components/Form";
 import Money from "@saleor/components/Money";
@@ -18,6 +15,10 @@ import Skeleton from "@saleor/components/Skeleton";
 import TableCellAvatar, {
   AVATAR_MARGIN
 } from "@saleor/components/TableCellAvatar";
+import createNonNegativeValueChangeHandler from "@saleor/utils/handlers/nonNegativeValueChangeHandler";
+import React from "react";
+import { FormattedMessage } from "react-intl";
+
 import { maybe, renderCollection } from "../../../misc";
 import { OrderDetails_order_lines } from "../../types/OrderDetails";
 
@@ -51,6 +52,9 @@ const useStyles = makeStyles(
       textAlign: "right",
       width: 150
     },
+    errorInfo: {
+      color: theme.palette.error.main
+    },
     quantityField: {
       "& input": {
         padding: "12px 12px 10px",
@@ -71,9 +75,7 @@ interface OrderDraftDetailsProductsProps {
   onOrderLineRemove: (id: string) => void;
 }
 
-const OrderDraftDetailsProducts: React.FC<
-  OrderDraftDetailsProductsProps
-> = props => {
+const OrderDraftDetailsProducts: React.FC<OrderDraftDetailsProductsProps> = props => {
   const { lines, onOrderLineChange, onOrderLineRemove } = props;
 
   const classes = useStyles(props);
@@ -128,6 +130,30 @@ const OrderDraftDetailsProducts: React.FC<
                   <>
                     <Typography variant="body2">{line.productName}</Typography>
                     <Typography variant="caption">{line.productSku}</Typography>
+                    {!line.variant.quantityAvailable ? (
+                      <Typography
+                        variant="caption"
+                        className={classes.errorInfo}
+                      >
+                        <FormattedMessage defaultMessage="Product is out of stock" />
+                      </Typography>
+                    ) : !line.variant.product.isAvailableForPurchase ? (
+                      <Typography
+                        variant="caption"
+                        className={classes.errorInfo}
+                      >
+                        <FormattedMessage defaultMessage="Product is unavailable to purchase" />
+                      </Typography>
+                    ) : (
+                      !line.variant.product.isPublished && (
+                        <Typography
+                          variant="caption"
+                          className={classes.errorInfo}
+                        >
+                          <FormattedMessage defaultMessage="Product is hidden" />
+                        </Typography>
+                      )
+                    )}
                   </>
                 ) : (
                   <Skeleton />
@@ -139,24 +165,34 @@ const OrderDraftDetailsProducts: React.FC<
                     initial={{ quantity: line.quantity }}
                     onSubmit={data => onOrderLineChange(line.id, data)}
                   >
-                    {({ change, data, hasChanged, submit }) => (
-                      <DebounceForm
-                        change={change}
-                        submit={hasChanged ? submit : undefined}
-                        time={200}
-                      >
-                        {debounce => (
-                          <TextField
-                            className={classes.quantityField}
-                            fullWidth
-                            name="quantity"
-                            type="number"
-                            value={data.quantity}
-                            onChange={debounce}
-                          />
-                        )}
-                      </DebounceForm>
-                    )}
+                    {({ change, data, hasChanged, submit }) => {
+                      const handleQuantityChange = createNonNegativeValueChangeHandler(
+                        change
+                      );
+
+                      return (
+                        <DebounceForm
+                          change={handleQuantityChange}
+                          submit={hasChanged ? submit : undefined}
+                          time={200}
+                        >
+                          {debounce => (
+                            <TextField
+                              className={classes.quantityField}
+                              fullWidth
+                              name="quantity"
+                              type="number"
+                              value={data.quantity}
+                              onChange={debounce}
+                              onBlur={submit}
+                              inputProps={{
+                                min: 1
+                              }}
+                            />
+                          )}
+                        </DebounceForm>
+                      );
+                    }}
                   </Form>
                 ) : (
                   <Skeleton />

@@ -4,6 +4,7 @@ import Typography from "@material-ui/core/Typography";
 import classNames from "classnames";
 import React from "react";
 import { FormattedMessage } from "react-intl";
+
 import ImageIcon from "../../icons/Image";
 import Dropzone from "../Dropzone";
 
@@ -14,6 +15,7 @@ interface ImageUploadProps {
   isActiveClassName?: string;
   iconContainerClassName?: string;
   iconContainerActiveClassName?: string;
+  hideUploadIcon?: boolean;
   onImageUpload: (file: FileList) => void;
 }
 
@@ -65,6 +67,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = props => {
     iconContainerActiveClassName,
     iconContainerClassName,
     isActiveClassName,
+    hideUploadIcon,
     onImageUpload
   } = props;
 
@@ -81,24 +84,26 @@ export const ImageUpload: React.FC<ImageUploadProps> = props => {
               [isActiveClassName]: isDragActive
             })}
           >
-            <div
-              className={classNames(iconContainerClassName, {
-                [iconContainerActiveClassName]: isDragActive
-              })}
-            >
-              <input
-                {...getInputProps()}
-                className={classes.fileField}
-                accept="image/*"
-              />
-              <ImageIcon className={classes.photosIcon} />
-              <Typography className={classes.uploadText}>
-                <FormattedMessage
-                  defaultMessage="Drop here to upload"
-                  description="image upload"
+            {!hideUploadIcon && (
+              <div
+                className={classNames(iconContainerClassName, {
+                  [iconContainerActiveClassName]: isDragActive
+                })}
+              >
+                <input
+                  {...getInputProps()}
+                  className={classes.fileField}
+                  accept="image/*"
                 />
-              </Typography>
-            </div>
+                <ImageIcon className={classes.photosIcon} />
+                <Typography className={classes.uploadText}>
+                  <FormattedMessage
+                    defaultMessage="Drop here to upload"
+                    description="image upload"
+                  />
+                </Typography>
+              </div>
+            )}
           </div>
           {children && children({ isDragActive })}
         </>

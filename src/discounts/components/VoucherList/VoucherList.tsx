@@ -3,23 +3,24 @@ import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableFooter from "@material-ui/core/TableFooter";
 import TableRow from "@material-ui/core/TableRow";
-import React from "react";
-import { FormattedMessage } from "react-intl";
-
 import Checkbox from "@saleor/components/Checkbox";
 import Date from "@saleor/components/Date";
 import Money from "@saleor/components/Money";
 import Percent from "@saleor/components/Percent";
 import ResponsiveTable from "@saleor/components/ResponsiveTable";
 import Skeleton from "@saleor/components/Skeleton";
+import TableCellHeader from "@saleor/components/TableCellHeader";
 import TableHead from "@saleor/components/TableHead";
 import TablePagination from "@saleor/components/TablePagination";
+import { VoucherListUrlSortField } from "@saleor/discounts/urls";
 import { maybe, renderCollection } from "@saleor/misc";
 import { ListActions, ListProps, SortPage } from "@saleor/types";
 import { DiscountValueTypeEnum } from "@saleor/types/globalTypes";
-import { VoucherListUrlSortField } from "@saleor/discounts/urls";
-import TableCellHeader from "@saleor/components/TableCellHeader";
 import { getArrowDirection } from "@saleor/utils/sort";
+import { getFooterColSpanWithBulkActions } from "@saleor/utils/tables";
+import React from "react";
+import { FormattedMessage } from "react-intl";
+
 import { VoucherList_vouchers_edges_node } from "../../types/VoucherList";
 
 export interface VoucherListProps
@@ -78,7 +79,7 @@ const useStyles = makeStyles(
   { name: "VoucherList" }
 );
 
-const numberOfColumns = 7;
+const numberOfColumns = 6;
 
 const VoucherList: React.FC<VoucherListProps> = props => {
   const {
@@ -130,6 +131,7 @@ const VoucherList: React.FC<VoucherListProps> = props => {
               ? getArrowDirection(sort.asc)
               : undefined
           }
+          textAlign="right"
           onClick={() => onSort(VoucherListUrlSortField.minSpent)}
           className={classes.colMinSpent}
         >
@@ -144,6 +146,7 @@ const VoucherList: React.FC<VoucherListProps> = props => {
               ? getArrowDirection(sort.asc)
               : undefined
           }
+          textAlign="right"
           onClick={() => onSort(VoucherListUrlSortField.startDate)}
           className={classes.colStart}
         >
@@ -158,6 +161,7 @@ const VoucherList: React.FC<VoucherListProps> = props => {
               ? getArrowDirection(sort.asc)
               : undefined
           }
+          textAlign="right"
           onClick={() => onSort(VoucherListUrlSortField.endDate)}
           className={classes.colEnd}
         >
@@ -172,6 +176,7 @@ const VoucherList: React.FC<VoucherListProps> = props => {
               ? getArrowDirection(sort.asc)
               : undefined
           }
+          textAlign="right"
           onClick={() => onSort(VoucherListUrlSortField.value)}
           className={classes.colValue}
         >
@@ -186,6 +191,7 @@ const VoucherList: React.FC<VoucherListProps> = props => {
               ? getArrowDirection(sort.asc)
               : undefined
           }
+          textAlign="right"
           onClick={() => onSort(VoucherListUrlSortField.limit)}
           className={classes.colUses}
         >
@@ -195,7 +201,7 @@ const VoucherList: React.FC<VoucherListProps> = props => {
       <TableFooter>
         <TableRow>
           <TablePagination
-            colSpan={numberOfColumns}
+            colSpan={getFooterColSpanWithBulkActions(vouchers, numberOfColumns)}
             settings={settings}
             hasNextPage={pageInfo && !disabled ? pageInfo.hasNextPage : false}
             onNextPage={onNextPage}

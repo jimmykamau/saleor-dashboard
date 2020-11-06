@@ -1,13 +1,13 @@
+import menuArrowIcon from "@assets/images/menu-arrow-icon.svg";
 import Hidden from "@material-ui/core/Hidden";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
+import useTheme from "@saleor/hooks/useTheme";
+import { createHref } from "@saleor/misc";
 import classNames from "classnames";
 import React from "react";
 import SVG from "react-inlinesvg";
 
-import menuArrowIcon from "@assets/images/menu-arrow-icon.svg";
-import useTheme from "@saleor/hooks/useTheme";
-import { createHref } from "@saleor/misc";
 import { drawerNestedMenuWidth, drawerWidthExpandedMobile } from "./consts";
 import { IActiveSubMenu } from "./MenuList";
 import { IMenuItem } from "./menuStructure";
@@ -162,7 +162,7 @@ const MenuNested: React.FC<MenuNestedProps> = props => {
               className={classNames(classes.menuListNestedClose, {
                 [classes.menuListNestedCloseDark]: isDark
               })}
-              data-tc={ariaLabel}
+              data-test={ariaLabel}
               onClick={() =>
                 closeSubMenu({
                   isActive: false,
@@ -178,7 +178,7 @@ const MenuNested: React.FC<MenuNestedProps> = props => {
           <a
             className={classNames(classes.menuListNestedItem)}
             href={createHref(item.url)}
-            data-tc={ariaLabel}
+            data-test={ariaLabel}
             onClick={event => closeMenu(item.url, event)}
             key={item.label}
           >

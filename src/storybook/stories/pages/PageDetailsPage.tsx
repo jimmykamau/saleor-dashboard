@@ -1,9 +1,9 @@
+import { PageErrorCode } from "@saleor/types/globalTypes";
 import { storiesOf } from "@storybook/react";
 import React from "react";
 
-import { PageErrorCode } from "@saleor/types/globalTypes";
 import PageDetailsPage, {
-  FormData,
+  PageDetailsPageFormData,
   PageDetailsPageProps
 } from "../../../pages/components/PageDetailsPage";
 import { page } from "../../../pages/fixtures";
@@ -36,7 +36,7 @@ storiesOf("Views / Pages / Page details", module)
         "isPublished",
         "seoDescription",
         "seoTitle"
-      ] as Array<keyof FormData>).map(field => ({
+      ] as Array<keyof PageDetailsPageFormData>).map(field => ({
         __typename: "PageError",
         code: PageErrorCode.INVALID,
         field

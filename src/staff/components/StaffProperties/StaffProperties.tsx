@@ -1,18 +1,18 @@
+import photoIcon from "@assets/images/photo-icon.svg";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
+import CardTitle from "@saleor/components/CardTitle";
+import { StaffErrorFragment } from "@saleor/fragments/types/StaffErrorFragment";
+import { commonMessages } from "@saleor/intl";
+import { getFormErrors } from "@saleor/utils/errors";
+import getStaffErrorMessage from "@saleor/utils/errors/staff";
 import React from "react";
 import SVG from "react-inlinesvg";
 import { FormattedMessage, useIntl } from "react-intl";
 
-import photoIcon from "@assets/images/photo-icon.svg";
-import CardTitle from "@saleor/components/CardTitle";
-import { commonMessages } from "@saleor/intl";
-import { getFormErrors } from "@saleor/utils/errors";
-import { StaffErrorFragment } from "@saleor/staff/types/StaffErrorFragment";
-import getStaffErrorMessage from "@saleor/utils/errors/staff";
 import { getUserInitials, maybe } from "../../../misc";
 import { StaffMemberDetails_user } from "../../types/StaffMemberDetails";
 
@@ -34,8 +34,16 @@ const useStyles = makeStyles(
       position: "relative",
       width: 120
     },
+    avatarActionText: {
+      "&:hover": {
+        textDecoration: "underline"
+      },
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: 12
+    },
     avatarDefault: {
-      "& p": {
+      "& div": {
         color: "#fff",
         fontSize: 35,
         fontWeight: "bold",
@@ -47,17 +55,10 @@ const useStyles = makeStyles(
       width: 120
     },
     avatarHover: {
-      "& p": {
-        "&:hover": {
-          textDecoration: "underline"
-        },
-        color: theme.palette.primary.main,
-        cursor: "pointer",
-        fontSize: 12,
-        fontWeight: 500
-      },
       background: "#00000080",
       borderRadius: "100%",
+      fontSize: 12,
+      fontWeight: 500,
       height: 120,
       opacity: 0,
       padding: theme.spacing(2.5, 0),
@@ -155,13 +156,19 @@ const StaffProperties: React.FC<StaffPropertiesProps> = props => {
               {canEditAvatar && (
                 <div className={classes.avatarHover}>
                   <SVG src={photoIcon} />
-                  <Typography onClick={clickImgInput}>
+                  <Typography
+                    onClick={clickImgInput}
+                    className={classes.avatarActionText}
+                  >
                     <FormattedMessage
                       defaultMessage="Change photo"
                       description="button"
                     />
                   </Typography>
-                  <Typography onClick={onImageDelete}>
+                  <Typography
+                    onClick={onImageDelete}
+                    className={classes.avatarActionText}
+                  >
                     <FormattedMessage
                       defaultMessage="Delete photo"
                       description="button"

@@ -1,32 +1,33 @@
-import React from "react";
-import { useIntl } from "react-intl";
-
-import WarehouseDetailsPage from "@saleor/warehouses/components/WarehouseDetailsPage";
+import NotFoundPage from "@saleor/components/NotFoundPage";
+import { WindowTitle } from "@saleor/components/WindowTitle";
 import useNavigator from "@saleor/hooks/useNavigator";
-import {
-  warehouseListUrl,
-  WarehouseUrlQueryParams,
-  warehouseUrl
-} from "@saleor/warehouses/urls";
-import { useWarehouseDetails } from "@saleor/warehouses/queries";
-import { commonMessages } from "@saleor/intl";
 import useNotifier from "@saleor/hooks/useNotifier";
+import useShop from "@saleor/hooks/useShop";
+import { commonMessages } from "@saleor/intl";
 import {
   findValueInEnum,
   getMutationStatus,
   getStringOrPlaceholder
 } from "@saleor/misc";
-import { CountryCode } from "@saleor/types/globalTypes";
-import useShop from "@saleor/hooks/useShop";
-import { WindowTitle } from "@saleor/components/WindowTitle";
-import {
-  useWarehouseUpdate,
-  useWarehouseDelete
-} from "@saleor/warehouses/mutations";
 import { shippingZoneUrl } from "@saleor/shipping/urls";
-import WarehouseDeleteDialog from "@saleor/warehouses/components/WarehouseDeleteDialog";
+import { CountryCode } from "@saleor/types/globalTypes";
 import createDialogActionHandlers from "@saleor/utils/handlers/dialogActionHandlers";
-import NotFoundPage from "@saleor/components/NotFoundPage";
+import WarehouseDeleteDialog from "@saleor/warehouses/components/WarehouseDeleteDialog";
+import WarehouseDetailsPage, {
+  WarehouseDetailsPageFormData
+} from "@saleor/warehouses/components/WarehouseDetailsPage";
+import {
+  useWarehouseDelete,
+  useWarehouseUpdate
+} from "@saleor/warehouses/mutations";
+import { useWarehouseDetails } from "@saleor/warehouses/queries";
+import {
+  warehouseListUrl,
+  warehouseUrl,
+  WarehouseUrlQueryParams
+} from "@saleor/warehouses/urls";
+import React from "react";
+import { useIntl } from "react-intl";
 
 export interface WarehouseDetailsProps {
   id: string;
@@ -45,7 +46,10 @@ const WarehouseDetails: React.FC<WarehouseDetailsProps> = ({ id, params }) => {
   const [updateWarehouse, updateWarehouseOpts] = useWarehouseUpdate({
     onCompleted: data => {
       if (data.updateWarehouse.errors.length === 0) {
-        notify({ text: intl.formatMessage(commonMessages.savedChanges) });
+        notify({
+          status: "success",
+          text: intl.formatMessage(commonMessages.savedChanges)
+        });
       }
     }
   });
@@ -55,6 +59,7 @@ const WarehouseDetails: React.FC<WarehouseDetailsProps> = ({ id, params }) => {
     onCompleted: data => {
       if (data.deleteWarehouse.errors.length === 0) {
         notify({
+          status: "success",
           text: intl.formatMessage(commonMessages.savedChanges)
         });
         navigate(warehouseListUrl());
@@ -73,6 +78,28 @@ const WarehouseDetails: React.FC<WarehouseDetailsProps> = ({ id, params }) => {
     return <NotFoundPage onBack={() => navigate(warehouseListUrl())} />;
   }
 
+  const handleSubmit = async (data: WarehouseDetailsPageFormData) => {
+    const result = await updateWarehouse({
+      variables: {
+        id,
+        input: {
+          address: {
+            city: data.city,
+            cityArea: data.cityArea,
+            country: findValueInEnum(data.country, CountryCode),
+            countryArea: data.countryArea,
+            phone: data.phone,
+            postalCode: data.postalCode,
+            streetAddress1: data.streetAddress1,
+            streetAddress2: data.streetAddress2
+          },
+          name: data.name
+        }
+      }
+    });
+
+    return result.data.updateWarehouse.errors;
+  };
   return (
     <>
       <WindowTitle title={data?.warehouse?.name} />
@@ -85,26 +112,7 @@ const WarehouseDetails: React.FC<WarehouseDetailsProps> = ({ id, params }) => {
         onBack={() => navigate(warehouseListUrl())}
         onDelete={() => openModal("delete")}
         onShippingZoneClick={id => navigate(shippingZoneUrl(id))}
-        onSubmit={data =>
-          updateWarehouse({
-            variables: {
-              id,
-              input: {
-                address: {
-                  city: data.city,
-                  cityArea: data.cityArea,
-                  country: findValueInEnum(data.country, CountryCode),
-                  countryArea: data.countryArea,
-                  phone: data.phone,
-                  postalCode: data.postalCode,
-                  streetAddress1: data.streetAddress1,
-                  streetAddress2: data.streetAddress2
-                },
-                name: data.name
-              }
-            }
-          })
-        }
+        onSubmit={handleSubmit}
       />
       <WarehouseDeleteDialog
         confirmButtonState={deleteWarehouseTransitionState}

@@ -1,9 +1,9 @@
+import { DiscountErrorCode } from "@saleor/types/globalTypes";
 import { storiesOf } from "@storybook/react";
 import React from "react";
 
-import { DiscountErrorCode } from "@saleor/types/globalTypes";
 import VoucherDetailsPage, {
-  FormData,
+  VoucherDetailsPageFormData,
   VoucherDetailsPageProps,
   VoucherDetailsPageTab
 } from "../../../discounts/components/VoucherDetailsPage";
@@ -59,7 +59,7 @@ storiesOf("Views / Discounts / Voucher details", module)
         "type",
         "usageLimit",
         "discountValue"
-      ] as Array<keyof FormData>).map(field => ({
+      ] as Array<keyof VoucherDetailsPageFormData>).map(field => ({
         __typename: "DiscountError",
         code: DiscountErrorCode.INVALID,
         field

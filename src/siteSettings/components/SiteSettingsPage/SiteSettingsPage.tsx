@@ -1,9 +1,7 @@
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import React from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-
 import AppHeader from "@saleor/components/AppHeader";
+import CompanyAddressInput from "@saleor/components/CompanyAddressInput";
 import { ConfirmButtonTransitionState } from "@saleor/components/ConfirmButton";
 import Container from "@saleor/components/Container";
 import Form from "@saleor/components/Form";
@@ -11,13 +9,16 @@ import Grid from "@saleor/components/Grid";
 import Hr from "@saleor/components/Hr";
 import PageHeader from "@saleor/components/PageHeader";
 import SaveButtonBar from "@saleor/components/SaveButtonBar";
+import { ShopErrorFragment } from "@saleor/fragments/types/ShopErrorFragment";
 import useAddressValidation from "@saleor/hooks/useAddressValidation";
+import { SubmitPromise } from "@saleor/hooks/useForm";
 import useStateFromProps from "@saleor/hooks/useStateFromProps";
 import { commonMessages, sectionNames } from "@saleor/intl";
 import createSingleAutocompleteSelectHandler from "@saleor/utils/handlers/singleAutocompleteSelectChangeHandler";
 import { mapCountriesToChoices } from "@saleor/utils/maps";
-import { ShopErrorFragment } from "@saleor/siteSettings/types/ShopErrorFragment";
-import CompanyAddressInput from "@saleor/components/CompanyAddressInput";
+import React from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+
 import { maybe } from "../../../misc";
 import { AuthorizationKeyType } from "../../../types/globalTypes";
 import { SiteSettings_shop } from "../../types/SiteSettings";
@@ -54,7 +55,7 @@ export interface SiteSettingsPageProps {
   onBack: () => void;
   onKeyAdd: () => void;
   onKeyRemove: (keyType: AuthorizationKeyType) => void;
-  onSubmit: (data: SiteSettingsPageFormData) => void;
+  onSubmit: (data: SiteSettingsPageFormData) => SubmitPromise;
 }
 
 export function areAddressInputFieldsModified(
@@ -105,7 +106,7 @@ const SiteSettingsPage: React.FC<SiteSettingsPageProps> = props => {
   const {
     errors: validationErrors,
     submit: handleSubmitWithAddress
-  } = useAddressValidation<SiteSettingsPageFormData>(onSubmit);
+  } = useAddressValidation(onSubmit);
 
   const initialFormAddress: SiteSettingsPageAddressFormData = {
     city: maybe(() => shop.companyAddress.city, ""),
@@ -134,7 +135,7 @@ const SiteSettingsPage: React.FC<SiteSettingsPageProps> = props => {
         const submitFunc = areAddressInputFieldsModified(data)
           ? handleSubmitWithAddress
           : onSubmit;
-        submitFunc(data);
+        return submitFunc(data);
       }}
       confirmLeave
     >

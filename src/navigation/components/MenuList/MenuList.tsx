@@ -5,20 +5,21 @@ import TableCell from "@material-ui/core/TableCell";
 import TableFooter from "@material-ui/core/TableFooter";
 import TableRow from "@material-ui/core/TableRow";
 import DeleteIcon from "@material-ui/icons/Delete";
-import React from "react";
-import { FormattedMessage } from "react-intl";
-
 import Checkbox from "@saleor/components/Checkbox";
 import IconButtonTableCell from "@saleor/components/IconButtonTableCell";
 import ResponsiveTable from "@saleor/components/ResponsiveTable";
 import Skeleton from "@saleor/components/Skeleton";
+import TableCellHeader from "@saleor/components/TableCellHeader";
 import TableHead from "@saleor/components/TableHead";
 import TablePagination from "@saleor/components/TablePagination";
 import { maybe, renderCollection } from "@saleor/misc";
-import { ListActions, ListProps, SortPage } from "@saleor/types";
 import { MenuListUrlSortField } from "@saleor/navigation/urls";
-import TableCellHeader from "@saleor/components/TableCellHeader";
+import { ListActions, ListProps, SortPage } from "@saleor/types";
 import { getArrowDirection } from "@saleor/utils/sort";
+import { getFooterColSpanWithBulkActions } from "@saleor/utils/tables";
+import React from "react";
+import { FormattedMessage } from "react-intl";
+
 import { MenuList_menus_edges_node } from "../../types/MenuList";
 
 export interface MenuListProps
@@ -37,6 +38,9 @@ const useStyles = makeStyles(
       },
       colTitle: {}
     },
+    colAction: {
+      width: 80
+    },
     colItems: {
       textAlign: "right"
     },
@@ -50,7 +54,7 @@ const useStyles = makeStyles(
   { name: "MenuList" }
 );
 
-const numberOfColumns = 4;
+const numberOfColumns = 3;
 
 const MenuList: React.FC<MenuListProps> = props => {
   const {
@@ -116,12 +120,12 @@ const MenuList: React.FC<MenuListProps> = props => {
               id="menuListItems"
             />
           </TableCellHeader>
-          <TableCell />
+          <TableCell className={classes.colAction} />
         </TableHead>
         <TableFooter>
           <TableRow>
             <TablePagination
-              colSpan={numberOfColumns}
+              colSpan={getFooterColSpanWithBulkActions(menus, numberOfColumns)}
               settings={settings}
               hasNextPage={pageInfo && !disabled ? pageInfo.hasNextPage : false}
               onNextPage={onNextPage}
@@ -165,6 +169,7 @@ const MenuList: React.FC<MenuListProps> = props => {
                     )}
                   </TableCell>
                   <IconButtonTableCell
+                    className={classes.colAction}
                     disabled={disabled}
                     onClick={() => onDelete(menu.id)}
                   >

@@ -5,19 +5,19 @@ import TableFooter from "@material-ui/core/TableFooter";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import EditIcon from "@material-ui/icons/Edit";
-import React from "react";
-import { useIntl } from "react-intl";
-
 import ResponsiveTable from "@saleor/components/ResponsiveTable";
 import Skeleton from "@saleor/components/Skeleton";
 import StatusLabel from "@saleor/components/StatusLabel";
+import TableCellHeader from "@saleor/components/TableCellHeader";
 import TablePagination from "@saleor/components/TablePagination";
 import { translateBoolean } from "@saleor/intl";
 import { maybe, renderCollection } from "@saleor/misc";
-import { ListProps, SortPage } from "@saleor/types";
 import { PluginListUrlSortField } from "@saleor/plugins/urls";
-import TableCellHeader from "@saleor/components/TableCellHeader";
+import { ListProps, SortPage } from "@saleor/types";
 import { getArrowDirection } from "@saleor/utils/sort";
+import React from "react";
+import { useIntl } from "react-intl";
+
 import { Plugins_plugins_edges_node } from "../../types/Plugins";
 
 export interface PluginListProps
@@ -28,18 +28,16 @@ export interface PluginListProps
 
 const useStyles = makeStyles(
   theme => ({
-    [theme.breakpoints.up("lg")]: {
-      colAction: {
-        "& svg": {
-          color: theme.palette.primary.main
-        },
-        textAlign: "right" as "right"
+    colAction: {
+      "& svg": {
+        color: theme.palette.primary.main
       },
-      colActive: {},
-      colName: {}
+      textAlign: "right",
+      width: 200
     },
-    colAction: {},
-    colActive: {},
+    colActive: {
+      width: 200
+    },
     colName: {},
     link: {
       cursor: "pointer"
@@ -48,7 +46,7 @@ const useStyles = makeStyles(
   { name: "PluginsList" }
 );
 
-const numberOfColumns = 4;
+const numberOfColumns = 3;
 
 const PluginList: React.FC<PluginListProps> = props => {
   const {
