@@ -1,9 +1,8 @@
-import React from "react";
-
 import { WindowTitle } from "@saleor/components/WindowTitle";
 import useNavigator from "@saleor/hooks/useNavigator";
 import useNotifier from "@saleor/hooks/useNotifier";
 import { commonMessages, sectionNames } from "@saleor/intl";
+import React from "react";
 import { useIntl } from "react-intl";
 
 import { configurationMenuUrl } from "../../configuration";
@@ -39,6 +38,7 @@ export const SiteSettings: React.FC<SiteSettingsProps> = ({ params }) => {
   const handleAddKeySuccess = (data: AuthorizationKeyAdd) => {
     if (data.authorizationKeyAdd.errors.length === 0) {
       notify({
+        status: "success",
         text: intl.formatMessage(commonMessages.savedChanges)
       });
       navigate(siteSettingsUrl());
@@ -47,10 +47,12 @@ export const SiteSettings: React.FC<SiteSettingsProps> = ({ params }) => {
   const handleDeleteKeySuccess = (data: AuthorizationKeyDelete) => {
     if (data.authorizationKeyDelete.errors.length === 0) {
       notify({
+        status: "success",
         text: intl.formatMessage(commonMessages.savedChanges)
       });
     } else {
       notify({
+        status: "error",
         text: intl.formatMessage(commonMessages.somethingWentWrong)
       });
     }
@@ -62,6 +64,7 @@ export const SiteSettings: React.FC<SiteSettingsProps> = ({ params }) => {
       data.shopAddressUpdate.errors.length === 0
     ) {
       notify({
+        status: "success",
         text: intl.formatMessage(commonMessages.savedChanges)
       });
     }
@@ -103,7 +106,7 @@ export const SiteSettings: React.FC<SiteSettingsProps> = ({ params }) => {
                           keyType: data.type
                         }
                       });
-                    const handleUpdateShopSettings = (
+                    const handleUpdateShopSettings = async (
                       data: SiteSettingsPageFormData
                     ) => {
                       const addressInput = areAddressInputFieldsModified(data)
@@ -120,7 +123,7 @@ export const SiteSettings: React.FC<SiteSettingsProps> = ({ params }) => {
                         : {
                             companyName: data.companyName
                           };
-                      updateShopSettings({
+                      const result = await updateShopSettings({
                         variables: {
                           addressInput,
                           shopDomainInput: {
@@ -136,6 +139,12 @@ export const SiteSettings: React.FC<SiteSettingsProps> = ({ params }) => {
                           }
                         }
                       });
+
+                      return [
+                        ...result.data.shopAddressUpdate.errors,
+                        ...result.data.shopDomainUpdate.errors,
+                        ...result.data.shopSettingsUpdate.errors
+                      ];
                     };
 
                     return (

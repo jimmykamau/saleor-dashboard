@@ -6,9 +6,6 @@ import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import DeleteIcon from "@material-ui/icons/Delete";
-import React from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-
 import CardTitle from "@saleor/components/CardTitle";
 import ResponsiveTable from "@saleor/components/ResponsiveTable";
 import Skeleton from "@saleor/components/Skeleton";
@@ -16,9 +13,11 @@ import {
   SortableTableBody,
   SortableTableRow
 } from "@saleor/components/SortableTable";
+import { AttributeDetailsFragment_values } from "@saleor/fragments/types/AttributeDetailsFragment";
 import { maybe, renderCollection, stopPropagation } from "@saleor/misc";
 import { ReorderAction } from "@saleor/types";
-import { AttributeDetailsFragment_values } from "../../types/AttributeDetailsFragment";
+import React from "react";
+import { FormattedMessage, useIntl } from "react-intl";
 
 export interface AttributeValuesProps {
   disabled: boolean;
@@ -32,13 +31,13 @@ export interface AttributeValuesProps {
 const useStyles = makeStyles(
   theme => ({
     columnAdmin: {
-      width: "50%"
+      width: 300
     },
     columnDrag: {
       width: 48 + theme.spacing(1.5)
     },
     columnStore: {
-      width: "50%"
+      width: "auto"
     },
     dragIcon: {
       cursor: "grab"
@@ -47,7 +46,7 @@ const useStyles = makeStyles(
       "&:last-child": {
         paddingRight: theme.spacing()
       },
-      width: 48 + theme.spacing(1.5)
+      width: 80
     },
     link: {
       cursor: "pointer"
@@ -99,7 +98,7 @@ const AttributeValues: React.FC<AttributeValuesProps> = ({
                 description="attribute values list: name column header"
               />
             </TableCell>
-            <TableCell />
+            <TableCell className={classes.iconCell} />
           </TableRow>
         </TableHead>
         <SortableTableBody onSortEnd={onValueReorder}>

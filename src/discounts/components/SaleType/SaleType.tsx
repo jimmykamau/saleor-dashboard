@@ -1,19 +1,19 @@
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import { makeStyles } from "@material-ui/core/styles";
-import React from "react";
-import { IntlShape, useIntl } from "react-intl";
-
 import CardTitle from "@saleor/components/CardTitle";
 import RadioGroupField, {
   RadioGroupFieldChoice
 } from "@saleor/components/RadioGroupField";
 import { FormChange } from "@saleor/hooks/useForm";
 import { SaleType as SaleTypeEnum } from "@saleor/types/globalTypes";
-import { FormData } from "../SaleDetailsPage";
+import React from "react";
+import { IntlShape, useIntl } from "react-intl";
+
+import { SaleDetailsPageFormData } from "../SaleDetailsPage";
 
 export interface SaleTypeProps {
-  data: FormData;
+  data: SaleDetailsPageFormData;
   disabled: boolean;
   onChange: FormChange;
 }
@@ -70,7 +70,7 @@ const SaleType: React.FC<SaleTypeProps> = props => {
         <RadioGroupField
           choices={choices}
           disabled={disabled}
-          name={"type" as keyof FormData}
+          name={"type" as keyof SaleDetailsPageFormData}
           value={data.type}
           onChange={onChange}
         />

@@ -1,3 +1,6 @@
+import saleorDarkLogoSmall from "@assets/images/logo-dark-small.svg";
+import saleorDarkLogo from "@assets/images/logo-dark.svg";
+import menuArrowIcon from "@assets/images/menu-arrow-icon.svg";
 import Avatar from "@material-ui/core/Avatar";
 import Chip from "@material-ui/core/Chip";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
@@ -9,15 +12,6 @@ import Menu from "@material-ui/core/MenuList";
 import Paper from "@material-ui/core/Paper";
 import Popper from "@material-ui/core/Popper";
 import { makeStyles } from "@material-ui/core/styles";
-import classNames from "classnames";
-import React from "react";
-import SVG from "react-inlinesvg";
-import { FormattedMessage, useIntl } from "react-intl";
-import useRouter from "use-react-router";
-
-import saleorDarkLogoSmall from "@assets/images/logo-dark-small.svg";
-import saleorDarkLogo from "@assets/images/logo-dark.svg";
-import menuArrowIcon from "@assets/images/menu-arrow-icon.svg";
 import { createConfigurationMenu } from "@saleor/configuration";
 import useAppState from "@saleor/hooks/useAppState";
 import useLocalStorage from "@saleor/hooks/useLocalStorage";
@@ -26,8 +20,16 @@ import useTheme from "@saleor/hooks/useTheme";
 import useUser from "@saleor/hooks/useUser";
 import ArrowDropdown from "@saleor/icons/ArrowDropdown";
 import { staffMemberDetailsUrl } from "@saleor/staff/urls";
+import classNames from "classnames";
+import React from "react";
+import SVG from "react-inlinesvg";
+import { FormattedMessage, useIntl } from "react-intl";
+import useRouter from "use-react-router";
+
 import Container from "../Container";
 import ErrorPage from "../ErrorPage";
+import Navigator from "../Navigator";
+import NavigatorButton from "../NavigatorButton/NavigatorButton";
 import AppActionContext from "./AppActionContext";
 import AppHeaderContext from "./AppHeaderContext";
 import { appLoaderHeight, drawerWidth, drawerWidthExpanded } from "./consts";
@@ -47,6 +49,9 @@ const useStyles = makeStyles(
       gridColumn: 2,
       position: "sticky",
       zIndex: 10
+    },
+    appActionDocked: {
+      position: "static"
     },
     appLoader: {
       height: appLoaderHeight,
@@ -310,6 +315,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const intl = useIntl();
   const [appState, dispatchAppState] = useAppState();
   const { location } = useRouter();
+  const [isNavigatorVisible, setNavigatorVisibility] = React.useState(false);
+  const [docked, setDocked] = React.useState(true);
 
   const menuStructure = createMenuStructure(intl);
   const configurationMenu = createConfigurationMenu(intl);
@@ -356,167 +363,197 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   };
 
   return (
-    <AppHeaderContext.Provider value={appHeaderAnchor}>
-      <AppActionContext.Provider value={appActionAnchor}>
-        <div className={classes.root}>
-          <div className={classes.sideBar}>
-            <ResponsiveDrawer
-              onClose={() => setDrawerState(false)}
-              open={isDrawerOpened}
-              small={!isMenuSmall}
-            >
-              <div
-                className={classNames(classes.logo, {
-                  [classes.logoSmall]: isMenuSmall,
-                  [classes.logoDark]: isDark
-                })}
+    <>
+      <Navigator
+        visible={isNavigatorVisible}
+        setVisibility={setNavigatorVisibility}
+      />
+      <AppHeaderContext.Provider value={appHeaderAnchor}>
+        <AppActionContext.Provider
+          value={{
+            anchor: appActionAnchor,
+            docked,
+            setDocked
+          }}
+        >
+          <div className={classes.root}>
+            <div className={classes.sideBar}>
+              <ResponsiveDrawer
+                onClose={() => setDrawerState(false)}
+                open={isDrawerOpened}
+                small={!isMenuSmall}
               >
-                <SVG src={isMenuSmall ? saleorDarkLogoSmall : saleorDarkLogo} />
-              </div>
-              <Hidden smDown>
                 <div
-                  className={classNames(classes.isMenuSmall, {
-                    [classes.isMenuSmallHide]: isMenuSmall,
-                    [classes.isMenuSmallDark]: isDark
+                  className={classNames(classes.logo, {
+                    [classes.logoSmall]: isMenuSmall,
+                    [classes.logoDark]: isDark
                   })}
-                  onClick={handleIsMenuSmall}
                 >
-                  <SVG src={menuArrowIcon} />
+                  <SVG
+                    src={isMenuSmall ? saleorDarkLogoSmall : saleorDarkLogo}
+                  />
                 </div>
-              </Hidden>
-              <MenuList
-                className={isMenuSmall ? classes.menuSmall : classes.menu}
-                menuItems={menuStructure}
-                isMenuSmall={!isMenuSmall}
-                location={location.pathname}
-                user={user}
-                renderConfigure={renderConfigure}
-                onMenuItemClick={handleMenuItemClick}
-              />
-            </ResponsiveDrawer>
-          </div>
-          <div
-            className={classNames(classes.content, {
-              [classes.contentToggle]: isMenuSmall
-            })}
-          >
-            {appState.loading ? (
-              <LinearProgress className={classes.appLoader} color="primary" />
-            ) : (
-              <div className={classes.appLoaderPlaceholder} />
-            )}
-            <div className={classes.viewContainer}>
-              <div>
-                <Container>
-                  <div className={classes.header}>
-                    <div
-                      className={classNames(classes.menuIcon, {
-                        [classes.menuIconOpen]: isDrawerOpened,
-                        [classes.menuIconDark]: isDark
-                      })}
-                      onClick={() => setDrawerState(!isDrawerOpened)}
-                    >
-                      <span />
-                      <span />
-                      <span />
-                      <span />
-                    </div>
-                    <div ref={appHeaderAnchor} />
-                    <div className={classes.spacer} />
-                    <div className={classes.userBar}>
-                      <ThemeSwitch
-                        className={classes.darkThemeSwitch}
-                        checked={isDark}
-                        onClick={toggleTheme}
-                      />
-                      <div className={classes.userMenuContainer} ref={anchor}>
-                        <Chip
-                          avatar={
-                            user.avatar && (
-                              <Avatar alt="user" src={user.avatar.url} />
-                            )
-                          }
-                          classes={{
-                            avatar: classes.avatar
-                          }}
-                          className={classes.userChip}
-                          label={
-                            <>
-                              {user.email}
-                              <ArrowDropdown
-                                className={classNames(classes.arrow, {
-                                  [classes.rotate]: isMenuOpened
-                                })}
-                              />
-                            </>
-                          }
-                          onClick={() => setMenuState(!isMenuOpened)}
+                <Hidden smDown>
+                  <div
+                    className={classNames(classes.isMenuSmall, {
+                      [classes.isMenuSmallHide]: isMenuSmall,
+                      [classes.isMenuSmallDark]: isDark
+                    })}
+                    onClick={handleIsMenuSmall}
+                  >
+                    <SVG src={menuArrowIcon} />
+                  </div>
+                </Hidden>
+                <MenuList
+                  className={isMenuSmall ? classes.menuSmall : classes.menu}
+                  menuItems={menuStructure}
+                  isMenuSmall={!isMenuSmall}
+                  location={location.pathname}
+                  user={user}
+                  renderConfigure={renderConfigure}
+                  onMenuItemClick={handleMenuItemClick}
+                />
+              </ResponsiveDrawer>
+            </div>
+            <div
+              className={classNames(classes.content, {
+                [classes.contentToggle]: isMenuSmall
+              })}
+            >
+              {appState.loading ? (
+                <LinearProgress className={classes.appLoader} color="primary" />
+              ) : (
+                <div className={classes.appLoaderPlaceholder} />
+              )}
+              <div className={classes.viewContainer}>
+                <div>
+                  <Container>
+                    <div className={classes.header}>
+                      <div
+                        className={classNames(classes.menuIcon, {
+                          [classes.menuIconOpen]: isDrawerOpened,
+                          [classes.menuIconDark]: isDark
+                        })}
+                        onClick={() => setDrawerState(!isDrawerOpened)}
+                      >
+                        <span />
+                        <span />
+                        <span />
+                        <span />
+                      </div>
+                      <div ref={appHeaderAnchor} />
+                      <div className={classes.spacer} />
+                      <div className={classes.userBar}>
+                        <ThemeSwitch
+                          className={classes.darkThemeSwitch}
+                          checked={isDark}
+                          onClick={toggleTheme}
                         />
-                        <Popper
-                          className={classes.popover}
-                          open={isMenuOpened}
-                          anchorEl={anchor.current}
-                          transition
-                          placement="bottom-end"
-                        >
-                          {({ TransitionProps, placement }) => (
-                            <Grow
-                              {...TransitionProps}
-                              style={{
-                                transformOrigin:
-                                  placement === "bottom"
-                                    ? "right top"
-                                    : "right bottom"
-                              }}
-                            >
-                              <Paper>
-                                <ClickAwayListener
-                                  onClickAway={() => setMenuState(false)}
-                                  mouseEvent="onClick"
-                                >
-                                  <Menu>
-                                    <MenuItem
-                                      className={classes.userMenuItem}
-                                      onClick={handleViewerProfile}
-                                    >
-                                      <FormattedMessage
-                                        defaultMessage="Account Settings"
-                                        description="button"
-                                      />
-                                    </MenuItem>
-                                    <MenuItem
-                                      className={classes.userMenuItem}
-                                      onClick={handleLogout}
-                                    >
-                                      <FormattedMessage
-                                        defaultMessage="Log out"
-                                        description="button"
-                                      />
-                                    </MenuItem>
-                                  </Menu>
-                                </ClickAwayListener>
-                              </Paper>
-                            </Grow>
-                          )}
-                        </Popper>
+                        <Hidden smDown>
+                          <NavigatorButton
+                            isMac={navigator.platform
+                              .toLowerCase()
+                              .includes("mac")}
+                            onClick={() => setNavigatorVisibility(true)}
+                          />
+                        </Hidden>
+                        <div className={classes.userMenuContainer} ref={anchor}>
+                          <Chip
+                            avatar={
+                              user.avatar && (
+                                <Avatar alt="user" src={user.avatar.url} />
+                              )
+                            }
+                            classes={{
+                              avatar: classes.avatar
+                            }}
+                            className={classes.userChip}
+                            label={
+                              <>
+                                {user.email}
+                                <ArrowDropdown
+                                  className={classNames(classes.arrow, {
+                                    [classes.rotate]: isMenuOpened
+                                  })}
+                                />
+                              </>
+                            }
+                            onClick={() => setMenuState(!isMenuOpened)}
+                            data-test="userMenu"
+                          />
+                          <Popper
+                            className={classes.popover}
+                            open={isMenuOpened}
+                            anchorEl={anchor.current}
+                            transition
+                            placement="bottom-end"
+                          >
+                            {({ TransitionProps, placement }) => (
+                              <Grow
+                                {...TransitionProps}
+                                style={{
+                                  transformOrigin:
+                                    placement === "bottom"
+                                      ? "right top"
+                                      : "right bottom"
+                                }}
+                              >
+                                <Paper>
+                                  <ClickAwayListener
+                                    onClickAway={() => setMenuState(false)}
+                                    mouseEvent="onClick"
+                                  >
+                                    <Menu>
+                                      <MenuItem
+                                        className={classes.userMenuItem}
+                                        onClick={handleViewerProfile}
+                                        data-test="accountSettingsButton"
+                                      >
+                                        <FormattedMessage
+                                          defaultMessage="Account Settings"
+                                          description="button"
+                                        />
+                                      </MenuItem>
+                                      <MenuItem
+                                        className={classes.userMenuItem}
+                                        onClick={handleLogout}
+                                        data-test="logOutButton"
+                                      >
+                                        <FormattedMessage
+                                          defaultMessage="Log out"
+                                          description="button"
+                                        />
+                                      </MenuItem>
+                                    </Menu>
+                                  </ClickAwayListener>
+                                </Paper>
+                              </Grow>
+                            )}
+                          </Popper>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Container>
+                  </Container>
+                </div>
+                <main className={classes.view}>
+                  {appState.error
+                    ? appState.error === "unhandled" && (
+                        <ErrorPage onBack={handleErrorBack} />
+                      )
+                    : children}
+                </main>
               </div>
-              <main className={classes.view}>
-                {appState.error
-                  ? appState.error === "unhandled" && (
-                      <ErrorPage onBack={handleErrorBack} />
-                    )
-                  : children}
-              </main>
+              <div
+                className={classNames(classes.appAction, {
+                  [classes.appActionDocked]: docked
+                })}
+                ref={appActionAnchor}
+              />
             </div>
-            <div className={classes.appAction} ref={appActionAnchor} />
           </div>
-        </div>
-      </AppActionContext.Provider>
-    </AppHeaderContext.Provider>
+        </AppActionContext.Provider>
+      </AppHeaderContext.Provider>
+    </>
   );
 };
 

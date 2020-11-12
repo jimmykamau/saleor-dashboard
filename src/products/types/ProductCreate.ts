@@ -2,7 +2,7 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { AttributeValueInput, SeoInput, StockInput, ProductErrorCode, AttributeInputTypeEnum } from "./../../types/globalTypes";
+import { ProductCreateInput, ProductErrorCode, AttributeInputTypeEnum, WeightUnitsEnum } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: ProductCreate
@@ -12,6 +12,7 @@ export interface ProductCreate_productCreate_errors {
   __typename: "ProductError";
   code: ProductErrorCode;
   field: string | null;
+  attributes: string[] | null;
 }
 
 export interface ProductCreate_productCreate_product_attributes_attribute_values {
@@ -58,12 +59,69 @@ export interface ProductCreate_productCreate_product_productType_variantAttribut
   values: (ProductCreate_productCreate_product_productType_variantAttributes_values | null)[] | null;
 }
 
+export interface ProductCreate_productCreate_product_productType_taxType {
+  __typename: "TaxType";
+  description: string | null;
+  taxCode: string | null;
+}
+
 export interface ProductCreate_productCreate_product_productType {
   __typename: "ProductType";
   id: string;
   variantAttributes: (ProductCreate_productCreate_product_productType_variantAttributes | null)[] | null;
   name: string;
   hasVariants: boolean;
+  taxType: ProductCreate_productCreate_product_productType_taxType | null;
+}
+
+export interface ProductCreate_productCreate_product_pricing_priceRangeUndiscounted_start_gross {
+  __typename: "Money";
+  amount: number;
+  currency: string;
+}
+
+export interface ProductCreate_productCreate_product_pricing_priceRangeUndiscounted_start {
+  __typename: "TaxedMoney";
+  gross: ProductCreate_productCreate_product_pricing_priceRangeUndiscounted_start_gross;
+}
+
+export interface ProductCreate_productCreate_product_pricing_priceRangeUndiscounted_stop_gross {
+  __typename: "Money";
+  amount: number;
+  currency: string;
+}
+
+export interface ProductCreate_productCreate_product_pricing_priceRangeUndiscounted_stop {
+  __typename: "TaxedMoney";
+  gross: ProductCreate_productCreate_product_pricing_priceRangeUndiscounted_stop_gross;
+}
+
+export interface ProductCreate_productCreate_product_pricing_priceRangeUndiscounted {
+  __typename: "TaxedMoneyRange";
+  start: ProductCreate_productCreate_product_pricing_priceRangeUndiscounted_start | null;
+  stop: ProductCreate_productCreate_product_pricing_priceRangeUndiscounted_stop | null;
+}
+
+export interface ProductCreate_productCreate_product_pricing {
+  __typename: "ProductPricingInfo";
+  priceRangeUndiscounted: ProductCreate_productCreate_product_pricing_priceRangeUndiscounted | null;
+}
+
+export interface ProductCreate_productCreate_product_metadata {
+  __typename: "MetadataItem";
+  key: string;
+  value: string;
+}
+
+export interface ProductCreate_productCreate_product_privateMetadata {
+  __typename: "MetadataItem";
+  key: string;
+  value: string;
+}
+
+export interface ProductCreate_productCreate_product_defaultVariant {
+  __typename: "ProductVariant";
+  id: string;
 }
 
 export interface ProductCreate_productCreate_product_category {
@@ -76,12 +134,6 @@ export interface ProductCreate_productCreate_product_collections {
   __typename: "Collection";
   id: string;
   name: string;
-}
-
-export interface ProductCreate_productCreate_product_basePrice {
-  __typename: "Money";
-  amount: number;
-  currency: string;
 }
 
 export interface ProductCreate_productCreate_product_margin {
@@ -108,39 +160,6 @@ export interface ProductCreate_productCreate_product_purchaseCost {
   stop: ProductCreate_productCreate_product_purchaseCost_stop | null;
 }
 
-export interface ProductCreate_productCreate_product_pricing_priceRange_start_net {
-  __typename: "Money";
-  amount: number;
-  currency: string;
-}
-
-export interface ProductCreate_productCreate_product_pricing_priceRange_start {
-  __typename: "TaxedMoney";
-  net: ProductCreate_productCreate_product_pricing_priceRange_start_net;
-}
-
-export interface ProductCreate_productCreate_product_pricing_priceRange_stop_net {
-  __typename: "Money";
-  amount: number;
-  currency: string;
-}
-
-export interface ProductCreate_productCreate_product_pricing_priceRange_stop {
-  __typename: "TaxedMoney";
-  net: ProductCreate_productCreate_product_pricing_priceRange_stop_net;
-}
-
-export interface ProductCreate_productCreate_product_pricing_priceRange {
-  __typename: "TaxedMoneyRange";
-  start: ProductCreate_productCreate_product_pricing_priceRange_start | null;
-  stop: ProductCreate_productCreate_product_pricing_priceRange_stop | null;
-}
-
-export interface ProductCreate_productCreate_product_pricing {
-  __typename: "ProductPricingInfo";
-  priceRange: ProductCreate_productCreate_product_pricing_priceRange | null;
-}
-
 export interface ProductCreate_productCreate_product_images {
   __typename: "ProductImage";
   id: string;
@@ -149,7 +168,7 @@ export interface ProductCreate_productCreate_product_images {
   url: string;
 }
 
-export interface ProductCreate_productCreate_product_variants_priceOverride {
+export interface ProductCreate_productCreate_product_variants_price {
   __typename: "Money";
   amount: number;
   currency: string;
@@ -174,10 +193,22 @@ export interface ProductCreate_productCreate_product_variants {
   id: string;
   sku: string;
   name: string;
-  priceOverride: ProductCreate_productCreate_product_variants_priceOverride | null;
+  price: ProductCreate_productCreate_product_variants_price | null;
   margin: number | null;
   stocks: (ProductCreate_productCreate_product_variants_stocks | null)[] | null;
   trackInventory: boolean;
+}
+
+export interface ProductCreate_productCreate_product_weight {
+  __typename: "Weight";
+  unit: WeightUnitsEnum;
+  value: number;
+}
+
+export interface ProductCreate_productCreate_product_taxType {
+  __typename: "TaxType";
+  description: string | null;
+  taxCode: string | null;
 }
 
 export interface ProductCreate_productCreate_product {
@@ -185,22 +216,30 @@ export interface ProductCreate_productCreate_product {
   id: string;
   attributes: ProductCreate_productCreate_product_attributes[];
   productType: ProductCreate_productCreate_product_productType;
+  pricing: ProductCreate_productCreate_product_pricing | null;
+  metadata: (ProductCreate_productCreate_product_metadata | null)[];
+  privateMetadata: (ProductCreate_productCreate_product_privateMetadata | null)[];
   name: string;
+  slug: string;
   descriptionJson: any;
   seoTitle: string | null;
   seoDescription: string | null;
+  defaultVariant: ProductCreate_productCreate_product_defaultVariant | null;
   category: ProductCreate_productCreate_product_category | null;
   collections: (ProductCreate_productCreate_product_collections | null)[] | null;
-  basePrice: ProductCreate_productCreate_product_basePrice | null;
   margin: ProductCreate_productCreate_product_margin | null;
   purchaseCost: ProductCreate_productCreate_product_purchaseCost | null;
+  isAvailableForPurchase: boolean | null;
   isAvailable: boolean | null;
   isPublished: boolean;
   chargeTaxes: boolean;
   publicationDate: any | null;
-  pricing: ProductCreate_productCreate_product_pricing | null;
   images: (ProductCreate_productCreate_product_images | null)[] | null;
   variants: (ProductCreate_productCreate_product_variants | null)[] | null;
+  weight: ProductCreate_productCreate_product_weight | null;
+  taxType: ProductCreate_productCreate_product_taxType | null;
+  availableForPurchase: any | null;
+  visibleInListings: boolean;
 }
 
 export interface ProductCreate_productCreate {
@@ -214,18 +253,5 @@ export interface ProductCreate {
 }
 
 export interface ProductCreateVariables {
-  attributes?: (AttributeValueInput | null)[] | null;
-  publicationDate?: any | null;
-  category: string;
-  chargeTaxes: boolean;
-  collections?: (string | null)[] | null;
-  descriptionJson?: any | null;
-  isPublished: boolean;
-  name: string;
-  basePrice?: any | null;
-  productType: string;
-  sku?: string | null;
-  seo?: SeoInput | null;
-  stocks: StockInput[];
-  trackInventory: boolean;
+  input: ProductCreateInput;
 }

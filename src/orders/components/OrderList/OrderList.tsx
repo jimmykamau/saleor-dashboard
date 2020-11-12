@@ -2,16 +2,15 @@ import { makeStyles } from "@material-ui/core/styles";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableFooter from "@material-ui/core/TableFooter";
-import TableRow from "@material-ui/core/TableRow";
 import TableHead from "@material-ui/core/TableHead";
-import React from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-
+import TableRow from "@material-ui/core/TableRow";
+import { CSSProperties } from "@material-ui/styles";
 import { DateTime } from "@saleor/components/Date";
 import Money from "@saleor/components/Money";
 import ResponsiveTable from "@saleor/components/ResponsiveTable";
 import Skeleton from "@saleor/components/Skeleton";
 import StatusLabel from "@saleor/components/StatusLabel";
+import TableCellHeader from "@saleor/components/TableCellHeader";
 import TablePagination from "@saleor/components/TablePagination";
 import {
   maybe,
@@ -19,42 +18,51 @@ import {
   transformOrderStatus,
   transformPaymentStatus
 } from "@saleor/misc";
-import { ListProps, SortPage } from "@saleor/types";
 import { OrderListUrlSortField } from "@saleor/orders/urls";
-import TableCellHeader from "@saleor/components/TableCellHeader";
+import { ListProps, SortPage } from "@saleor/types";
 import { getArrowDirection } from "@saleor/utils/sort";
+import React from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+
 import { OrderList_orders_edges_node } from "../../types/OrderList";
 
 const useStyles = makeStyles(
-  theme => ({
-    [theme.breakpoints.up("lg")]: {
-      colCustomer: {
-        width: 220
+  theme => {
+    const overflowing: CSSProperties = {
+      overflow: "hidden",
+      textOverflow: "ellipsis"
+    };
+
+    return {
+      [theme.breakpoints.up("lg")]: {
+        colCustomer: {
+          width: 220
+        },
+        colDate: {},
+        colFulfillment: {
+          width: 230
+        },
+        colNumber: {
+          width: 120
+        },
+        colPayment: {
+          width: 220
+        },
+        colTotal: {}
       },
+      colCustomer: overflowing,
       colDate: {},
-      colFulfillment: {
-        width: 230
+      colFulfillment: overflowing,
+      colNumber: {},
+      colPayment: overflowing,
+      colTotal: {
+        textAlign: "right"
       },
-      colNumber: {
-        width: 120
-      },
-      colPayment: {
-        width: 220
-      },
-      colTotal: {}
-    },
-    colCustomer: {},
-    colDate: {},
-    colFulfillment: {},
-    colNumber: {},
-    colPayment: {},
-    colTotal: {
-      textAlign: "right"
-    },
-    link: {
-      cursor: "pointer"
-    }
-  }),
+      link: {
+        cursor: "pointer"
+      }
+    };
+  },
   { name: "OrderList" }
 );
 

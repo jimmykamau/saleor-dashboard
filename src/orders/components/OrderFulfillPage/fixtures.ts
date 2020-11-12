@@ -1,8 +1,8 @@
 /* eslint-disable sort-keys */
 
+import * as placeholderImage from "@assets/images/sample-product.jpg";
 import { OrderFulfillData_order } from "@saleor/orders/types/OrderFulfillData";
 import { warehouseList } from "@saleor/warehouses/fixtures";
-import * as placeholderImage from "@assets/images/sample-product.jpg";
 
 export const orderToFulfill: OrderFulfillData_order = {
   __typename: "Order",
@@ -15,6 +15,7 @@ export const orderToFulfill: OrderFulfillData_order = {
       productName: "T-Shirt",
       quantity: 3,
       quantityFulfilled: 1,
+      allocations: [],
       variant: {
         __typename: "ProductVariant",
         id: "UHJvZHVjdFZhcmlhbnQ6Mjk2",
@@ -76,6 +77,7 @@ export const orderToFulfill: OrderFulfillData_order = {
       productName: "Lemon Juice",
       quantity: 4,
       quantityFulfilled: 0,
+      allocations: [],
       variant: {
         __typename: "ProductVariant",
         id: "UHJvZHVjdFZhcmlhbnQ6MTgx",
@@ -130,6 +132,7 @@ export const orderToFulfill: OrderFulfillData_order = {
       productName: "Orange Juice",
       quantity: 3,
       quantityFulfilled: 2,
+      allocations: [],
       variant: {
         __typename: "ProductVariant",
         id: "UHJvZHVjdFZhcmlhbnQ6MTgy",

@@ -2,7 +2,7 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { ProductErrorCode } from "./../../types/globalTypes";
+import { ProductErrorCode, WeightUnitsEnum } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: VariantImageAssign
@@ -12,6 +12,18 @@ export interface VariantImageAssign_variantImageAssign_errors {
   __typename: "ProductError";
   code: ProductErrorCode;
   field: string | null;
+}
+
+export interface VariantImageAssign_variantImageAssign_productVariant_metadata {
+  __typename: "MetadataItem";
+  key: string;
+  value: string;
+}
+
+export interface VariantImageAssign_variantImageAssign_productVariant_privateMetadata {
+  __typename: "MetadataItem";
+  key: string;
+  value: string;
 }
 
 export interface VariantImageAssign_variantImageAssign_productVariant_attributes_attribute_values {
@@ -55,10 +67,15 @@ export interface VariantImageAssign_variantImageAssign_productVariant_images {
   url: string;
 }
 
-export interface VariantImageAssign_variantImageAssign_productVariant_priceOverride {
+export interface VariantImageAssign_variantImageAssign_productVariant_price {
   __typename: "Money";
   amount: number;
   currency: string;
+}
+
+export interface VariantImageAssign_variantImageAssign_productVariant_product_defaultVariant {
+  __typename: "ProductVariant";
+  id: string;
 }
 
 export interface VariantImageAssign_variantImageAssign_productVariant_product_images {
@@ -91,6 +108,7 @@ export interface VariantImageAssign_variantImageAssign_productVariant_product_va
 export interface VariantImageAssign_variantImageAssign_productVariant_product {
   __typename: "Product";
   id: string;
+  defaultVariant: VariantImageAssign_variantImageAssign_productVariant_product_defaultVariant | null;
   images: (VariantImageAssign_variantImageAssign_productVariant_product_images | null)[] | null;
   name: string;
   thumbnail: VariantImageAssign_variantImageAssign_productVariant_product_thumbnail | null;
@@ -111,18 +129,27 @@ export interface VariantImageAssign_variantImageAssign_productVariant_stocks {
   warehouse: VariantImageAssign_variantImageAssign_productVariant_stocks_warehouse;
 }
 
+export interface VariantImageAssign_variantImageAssign_productVariant_weight {
+  __typename: "Weight";
+  unit: WeightUnitsEnum;
+  value: number;
+}
+
 export interface VariantImageAssign_variantImageAssign_productVariant {
   __typename: "ProductVariant";
   id: string;
+  metadata: (VariantImageAssign_variantImageAssign_productVariant_metadata | null)[];
+  privateMetadata: (VariantImageAssign_variantImageAssign_productVariant_privateMetadata | null)[];
   attributes: VariantImageAssign_variantImageAssign_productVariant_attributes[];
   costPrice: VariantImageAssign_variantImageAssign_productVariant_costPrice | null;
   images: (VariantImageAssign_variantImageAssign_productVariant_images | null)[] | null;
   name: string;
-  priceOverride: VariantImageAssign_variantImageAssign_productVariant_priceOverride | null;
+  price: VariantImageAssign_variantImageAssign_productVariant_price | null;
   product: VariantImageAssign_variantImageAssign_productVariant_product;
   sku: string;
   stocks: (VariantImageAssign_variantImageAssign_productVariant_stocks | null)[] | null;
   trackInventory: boolean;
+  weight: VariantImageAssign_variantImageAssign_productVariant_weight | null;
 }
 
 export interface VariantImageAssign_variantImageAssign {

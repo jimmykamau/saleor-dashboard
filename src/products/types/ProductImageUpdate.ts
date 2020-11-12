@@ -2,7 +2,7 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { ProductErrorCode, AttributeInputTypeEnum } from "./../../types/globalTypes";
+import { ProductErrorCode, AttributeInputTypeEnum, WeightUnitsEnum } from "./../../types/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: ProductImageUpdate
@@ -58,12 +58,69 @@ export interface ProductImageUpdate_productImageUpdate_product_productType_varia
   values: (ProductImageUpdate_productImageUpdate_product_productType_variantAttributes_values | null)[] | null;
 }
 
+export interface ProductImageUpdate_productImageUpdate_product_productType_taxType {
+  __typename: "TaxType";
+  description: string | null;
+  taxCode: string | null;
+}
+
 export interface ProductImageUpdate_productImageUpdate_product_productType {
   __typename: "ProductType";
   id: string;
   variantAttributes: (ProductImageUpdate_productImageUpdate_product_productType_variantAttributes | null)[] | null;
   name: string;
   hasVariants: boolean;
+  taxType: ProductImageUpdate_productImageUpdate_product_productType_taxType | null;
+}
+
+export interface ProductImageUpdate_productImageUpdate_product_pricing_priceRangeUndiscounted_start_gross {
+  __typename: "Money";
+  amount: number;
+  currency: string;
+}
+
+export interface ProductImageUpdate_productImageUpdate_product_pricing_priceRangeUndiscounted_start {
+  __typename: "TaxedMoney";
+  gross: ProductImageUpdate_productImageUpdate_product_pricing_priceRangeUndiscounted_start_gross;
+}
+
+export interface ProductImageUpdate_productImageUpdate_product_pricing_priceRangeUndiscounted_stop_gross {
+  __typename: "Money";
+  amount: number;
+  currency: string;
+}
+
+export interface ProductImageUpdate_productImageUpdate_product_pricing_priceRangeUndiscounted_stop {
+  __typename: "TaxedMoney";
+  gross: ProductImageUpdate_productImageUpdate_product_pricing_priceRangeUndiscounted_stop_gross;
+}
+
+export interface ProductImageUpdate_productImageUpdate_product_pricing_priceRangeUndiscounted {
+  __typename: "TaxedMoneyRange";
+  start: ProductImageUpdate_productImageUpdate_product_pricing_priceRangeUndiscounted_start | null;
+  stop: ProductImageUpdate_productImageUpdate_product_pricing_priceRangeUndiscounted_stop | null;
+}
+
+export interface ProductImageUpdate_productImageUpdate_product_pricing {
+  __typename: "ProductPricingInfo";
+  priceRangeUndiscounted: ProductImageUpdate_productImageUpdate_product_pricing_priceRangeUndiscounted | null;
+}
+
+export interface ProductImageUpdate_productImageUpdate_product_metadata {
+  __typename: "MetadataItem";
+  key: string;
+  value: string;
+}
+
+export interface ProductImageUpdate_productImageUpdate_product_privateMetadata {
+  __typename: "MetadataItem";
+  key: string;
+  value: string;
+}
+
+export interface ProductImageUpdate_productImageUpdate_product_defaultVariant {
+  __typename: "ProductVariant";
+  id: string;
 }
 
 export interface ProductImageUpdate_productImageUpdate_product_category {
@@ -76,12 +133,6 @@ export interface ProductImageUpdate_productImageUpdate_product_collections {
   __typename: "Collection";
   id: string;
   name: string;
-}
-
-export interface ProductImageUpdate_productImageUpdate_product_basePrice {
-  __typename: "Money";
-  amount: number;
-  currency: string;
 }
 
 export interface ProductImageUpdate_productImageUpdate_product_margin {
@@ -108,39 +159,6 @@ export interface ProductImageUpdate_productImageUpdate_product_purchaseCost {
   stop: ProductImageUpdate_productImageUpdate_product_purchaseCost_stop | null;
 }
 
-export interface ProductImageUpdate_productImageUpdate_product_pricing_priceRange_start_net {
-  __typename: "Money";
-  amount: number;
-  currency: string;
-}
-
-export interface ProductImageUpdate_productImageUpdate_product_pricing_priceRange_start {
-  __typename: "TaxedMoney";
-  net: ProductImageUpdate_productImageUpdate_product_pricing_priceRange_start_net;
-}
-
-export interface ProductImageUpdate_productImageUpdate_product_pricing_priceRange_stop_net {
-  __typename: "Money";
-  amount: number;
-  currency: string;
-}
-
-export interface ProductImageUpdate_productImageUpdate_product_pricing_priceRange_stop {
-  __typename: "TaxedMoney";
-  net: ProductImageUpdate_productImageUpdate_product_pricing_priceRange_stop_net;
-}
-
-export interface ProductImageUpdate_productImageUpdate_product_pricing_priceRange {
-  __typename: "TaxedMoneyRange";
-  start: ProductImageUpdate_productImageUpdate_product_pricing_priceRange_start | null;
-  stop: ProductImageUpdate_productImageUpdate_product_pricing_priceRange_stop | null;
-}
-
-export interface ProductImageUpdate_productImageUpdate_product_pricing {
-  __typename: "ProductPricingInfo";
-  priceRange: ProductImageUpdate_productImageUpdate_product_pricing_priceRange | null;
-}
-
 export interface ProductImageUpdate_productImageUpdate_product_images {
   __typename: "ProductImage";
   id: string;
@@ -149,7 +167,7 @@ export interface ProductImageUpdate_productImageUpdate_product_images {
   url: string;
 }
 
-export interface ProductImageUpdate_productImageUpdate_product_variants_priceOverride {
+export interface ProductImageUpdate_productImageUpdate_product_variants_price {
   __typename: "Money";
   amount: number;
   currency: string;
@@ -174,10 +192,22 @@ export interface ProductImageUpdate_productImageUpdate_product_variants {
   id: string;
   sku: string;
   name: string;
-  priceOverride: ProductImageUpdate_productImageUpdate_product_variants_priceOverride | null;
+  price: ProductImageUpdate_productImageUpdate_product_variants_price | null;
   margin: number | null;
   stocks: (ProductImageUpdate_productImageUpdate_product_variants_stocks | null)[] | null;
   trackInventory: boolean;
+}
+
+export interface ProductImageUpdate_productImageUpdate_product_weight {
+  __typename: "Weight";
+  unit: WeightUnitsEnum;
+  value: number;
+}
+
+export interface ProductImageUpdate_productImageUpdate_product_taxType {
+  __typename: "TaxType";
+  description: string | null;
+  taxCode: string | null;
 }
 
 export interface ProductImageUpdate_productImageUpdate_product {
@@ -185,22 +215,30 @@ export interface ProductImageUpdate_productImageUpdate_product {
   id: string;
   attributes: ProductImageUpdate_productImageUpdate_product_attributes[];
   productType: ProductImageUpdate_productImageUpdate_product_productType;
+  pricing: ProductImageUpdate_productImageUpdate_product_pricing | null;
+  metadata: (ProductImageUpdate_productImageUpdate_product_metadata | null)[];
+  privateMetadata: (ProductImageUpdate_productImageUpdate_product_privateMetadata | null)[];
   name: string;
+  slug: string;
   descriptionJson: any;
   seoTitle: string | null;
   seoDescription: string | null;
+  defaultVariant: ProductImageUpdate_productImageUpdate_product_defaultVariant | null;
   category: ProductImageUpdate_productImageUpdate_product_category | null;
   collections: (ProductImageUpdate_productImageUpdate_product_collections | null)[] | null;
-  basePrice: ProductImageUpdate_productImageUpdate_product_basePrice | null;
   margin: ProductImageUpdate_productImageUpdate_product_margin | null;
   purchaseCost: ProductImageUpdate_productImageUpdate_product_purchaseCost | null;
+  isAvailableForPurchase: boolean | null;
   isAvailable: boolean | null;
   isPublished: boolean;
   chargeTaxes: boolean;
   publicationDate: any | null;
-  pricing: ProductImageUpdate_productImageUpdate_product_pricing | null;
   images: (ProductImageUpdate_productImageUpdate_product_images | null)[] | null;
   variants: (ProductImageUpdate_productImageUpdate_product_variants | null)[] | null;
+  weight: ProductImageUpdate_productImageUpdate_product_weight | null;
+  taxType: ProductImageUpdate_productImageUpdate_product_taxType | null;
+  availableForPurchase: any | null;
+  visibleInListings: boolean;
 }
 
 export interface ProductImageUpdate_productImageUpdate {

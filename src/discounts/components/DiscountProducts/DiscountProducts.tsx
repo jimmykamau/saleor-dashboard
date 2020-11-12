@@ -7,9 +7,6 @@ import TableCell from "@material-ui/core/TableCell";
 import TableFooter from "@material-ui/core/TableFooter";
 import TableRow from "@material-ui/core/TableRow";
 import DeleteIcon from "@material-ui/icons/Delete";
-import React from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-
 import CardTitle from "@saleor/components/CardTitle";
 import Checkbox from "@saleor/components/Checkbox";
 import ResponsiveTable from "@saleor/components/ResponsiveTable";
@@ -20,6 +17,9 @@ import TableCellAvatar, {
 } from "@saleor/components/TableCellAvatar";
 import TableHead from "@saleor/components/TableHead";
 import TablePagination from "@saleor/components/TablePagination";
+import React from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+
 import { maybe, renderCollection } from "../../../misc";
 import { ListActions, ListProps } from "../../../types";
 import { SaleDetails_sale } from "../../types/SaleDetails";
@@ -44,7 +44,7 @@ const useStyles = makeStyles(
       width: "auto"
     },
     colNameLabel: {
-      marginLeft: AVATAR_MARGIN
+      marginLeft: AVATAR_MARGIN + theme.spacing(3)
     },
     colPublished: {
       width: 150
@@ -102,6 +102,13 @@ const DiscountProducts: React.FC<SaleProductsProps> = props => {
         }
       />
       <ResponsiveTable>
+        <colgroup>
+          <col />
+          <col className={classes.colName} />
+          <col className={classes.colType} />
+          <col className={classes.colPublished} />
+          <col className={classes.colActions} />
+        </colgroup>
         <TableHead
           colSpan={numberOfColumns}
           selected={selected}
@@ -124,7 +131,7 @@ const DiscountProducts: React.FC<SaleProductsProps> = props => {
               description="product is published"
             />
           </TableCell>
-          <TableCell />
+          <TableCell className={classes.colActions} />
         </TableHead>
         <TableFooter>
           <TableRow>

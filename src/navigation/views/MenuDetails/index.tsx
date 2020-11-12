@@ -1,7 +1,4 @@
 import DialogContentText from "@material-ui/core/DialogContentText";
-import React from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-
 import ActionDialog from "@saleor/components/ActionDialog";
 import { DEFAULT_INITIAL_SEARCH_DATA } from "@saleor/config";
 import useNavigator from "@saleor/hooks/useNavigator";
@@ -9,6 +6,9 @@ import useNotifier from "@saleor/hooks/useNotifier";
 import useCategorySearch from "@saleor/searches/useCategorySearch";
 import useCollectionSearch from "@saleor/searches/useCollectionSearch";
 import usePageSearch from "@saleor/searches/usePageSearch";
+import React from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+
 import { categoryUrl } from "../../../categories/urls";
 import { collectionUrl } from "../../../collections/urls";
 import { maybe } from "../../../misc";
@@ -141,28 +141,20 @@ const MenuDetails: React.FC<MenuDetailsProps> = ({ id, params }) => {
                   // that it should clean operation stack if mutations
                   // were successful
                   const handleSubmit = async (data: MenuDetailsSubmitData) => {
-                    try {
-                      const result = await menuUpdate({
-                        variables: {
-                          id,
-                          moves: getMoves(data),
-                          name: data.name,
-                          removeIds: getRemoveIds(data)
-                        }
-                      });
-                      if (result) {
-                        if (
-                          result.data.menuItemBulkDelete.errors.length > 0 ||
-                          result.data.menuItemMove.errors.length > 0 ||
-                          result.data.menuUpdate.errors.length > 0
-                        ) {
-                          return false;
-                        }
+                    const result = await menuUpdate({
+                      variables: {
+                        id,
+                        moves: getMoves(data),
+                        name: data.name,
+                        removeIds: getRemoveIds(data)
                       }
-                      return true;
-                    } catch {
-                      return false;
-                    }
+                    });
+
+                    return [
+                      ...result.data.menuItemBulkDelete.errors,
+                      ...result.data.menuItemMove.errors,
+                      ...result.data.menuUpdate.errors
+                    ];
                   };
 
                   return (
